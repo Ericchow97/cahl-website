@@ -1,19 +1,19 @@
 import React from 'react';
-import { CardTemplate } from '../CardTemplate';
 import { SeriesCarousel } from './SeriesCarousel'
 import { SeriesCard } from '../SeriesCard'
 
 export const SeriesHome = (props) => {
+    console.log(props.activeSeries.games)
     return (
-        <CardTemplate header="Current Series" style={{textAlign:"center"}}>
-            <SeriesCard
-                title="Series #112"
-                team1="Team Name 1"
-                team2="Team Name 2"
-                team1Score="3"
-                team2Score="2"
-                SeriesCarousel={SeriesCarousel}
-            />
-        </CardTemplate>
-    )
+        <SeriesCard
+            title={`Series # ${props.activeSeries.id}`}
+            team1Name={props.activeSeries.teams[0].name}
+            team2Name={props.activeSeries.teams[1].name}
+            team1Score={props.activeSeries.teams[0].series_score}
+            team2Score={props.activeSeries.teams[1].series_score}
+            SeriesCarousel={SeriesCarousel}
+            seriesGames={props.activeSeries.games}
+            seriesId={props.activeSeries.id}
+        />
+    )    
 }

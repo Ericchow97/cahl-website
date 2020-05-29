@@ -1,35 +1,25 @@
 import React from 'react'
-import { CardTemplate } from '../CardTemplate'
 import { List } from 'antd';
 
-export const PrevSummary = () => {
-    const data = [
-        {
-          title: 'Game Recap 1',
-        },
-        {
-          title: 'Game Recap 2',
-        },
-        {
-          title: 'Game Recap 3',
-        },
-        {
-          title: 'Game Recap 4',
-        },
-    ];
-    return (
-        <CardTemplate header="Previous Recaps" headSize="20px">
-            <List
-                itemLayout="horizontal"
-                dataSource={data}
-                renderItem={item => (
-                <List.Item>
-                    <List.Item.Meta
-                    title={item.title}
-                    />
-                </List.Item>
-                )}
-            />
-        </CardTemplate>
-    )
+export const PrevSummary = (props) => {
+  const data = props.allGames.map((gameData, i) => {
+    return {
+      id: gameData.id,
+      title: `${gameData.game_result[0].team_name} vs ${gameData.game_result[1].team_name} - Game ${gameData.num}`
+    }
+  })
+  //TODO: Display with pagination
+  return (
+    <List
+        itemLayout="horizontal"
+        dataSource={data}
+        renderItem={item => (
+          <List.Item onClick={() => props.handleClick(item.id)}>
+              <List.Item.Meta
+              title={item.title}
+              />
+          </List.Item>
+        )}
+    />
+  )
 }

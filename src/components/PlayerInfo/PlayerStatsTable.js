@@ -11,7 +11,7 @@ export const PlayerStatsTable = (props) => {
             pagination={false}
             style={{overflowX:'auto', paddingBottom: '24px'}}
           >
-                <Column title="Season" dataIndex="id" key="id" sorter={(a, b) => a.id - b.id} sortDirections={['descend', 'ascend']}/>
+                <Column title="Season" dataIndex="team" key="team" sorter={(a, b) => a.key - b.key} sortDirections={['descend', 'ascend']}/>
                 <Column title="GP" dataIndex="games" key="games" sorter={(a, b) => a.games - b.games} sortDirections={['descend', 'ascend']}/>
                 <Column title="G" dataIndex="goals" key="goals" sorter={(a, b) => a.goals - b.goals} sortDirections={['descend', 'ascend']}/>
                 <Column title="A" dataIndex="assists" key="assists" sorter={(a, b) => a.assists - b.assists} sortDirections={['descend', 'ascend']}/>

@@ -1,33 +1,6 @@
-.row {
-  text-align: center;
-  margin-right: 0;
-  margin-left: 0;
-}
-
-.centered {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  margin-right: -50%;
-  transform: translate(-50%, -50%);
-  width: 100%;
-}
-
-.card {
-  margin-top: 32px;
-  margin-bottom: 32px;
-}
-
 .gradient {
   background-image: linear-gradient(to right, rgb(30,30,30) , red);
   padding: 0 32px;
-}
-
-.card-header {
-  font-size: 32px;
-  font-weight: bold;
-  font-style: italic;
-  text-transform: uppercase;
 }
 
 thead {
@@ -43,9 +16,10 @@ thead {
   border-left: 1px solid rgb(138, 15, 15);
 }
 
-.carousel {
+.ant-carousel {
   width: 100%;
 }
+
 .carousel-row{
   border:2px solid rgb(138, 15, 15);
   font-size: 0.9rem;
@@ -78,30 +52,17 @@ thead {
   padding: 0;
 }
 
-.carousel-control-prev {
-  left:-5%;
-}
-
-.carousel-control-next {
-  right:-5%;
-}
-
-.carousel-indicators {
-  bottom: -50%;
-}
-
 .footer {
   background-color: black;
   padding: 10px;
   text-align: center;
   vertical-align: middle;
-  line-height: 100px;
+  line-height: 50px;
 }
 
 .col-sm-12 {
   padding:0;
 }
-
 
 .card-border {
   border: 2px solid rgb(138, 15, 15);
@@ -155,18 +116,10 @@ tr>td {
   margin-top:-100px;
 }
 
-.divider {
+.player-info {
   text-align: center;
-  font-size: 20px;
-  padding: 0 0 12px;
-}
-
-.div-pad {
-  padding: 0 4px;
-}
-
-.main-divider {
   font-size: 32px;
+  padding: 0 0 12px;
 }
 
 .ant-table-row-expand-icon {
@@ -185,6 +138,37 @@ tr>td {
   padding-bottom: 24px;
 }
 
-.ant-btn {
-  float: right;
+.ant-carousel .slick-dots-bottom {
+  bottom: -20px !important;
+  padding: 0px;
+}
+
+.ant-col {
+  width: 100%;
+}
+
+.ant-alert-message {
+  color: #000 !important
+}
+
+.ant-input-number-handler-wrap .ant-input-number-handler .ant-input-number-handler-up-inner, .ant-input-number-handler-wrap .ant-input-number-handler .ant-input-number-handler-down-inner {
+  color: black
+}
+
+.ant-form-item-explain {
+  margin-top: -4px !important;
+}
+
+.ant-table-tbody > tr :hover {
+  cursor: pointer;
+}
+
+.ant-list-item :hover {
+  cursor: pointer;
+  background-color: red;
+  color: black;
+}
+
+.ant-message-notice-content {
+  color:black
 }
