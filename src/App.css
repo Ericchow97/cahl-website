@@ -25,33 +25,6 @@ thead {
   font-size: 0.9rem;
 }
 
-@media only screen and (max-width: 510px) {
-  .center-float {
-      display: none;
-  }
-}
-
-.center-float {
-  position: absolute;
-  height: 100%;
-  right: 5%;
-  top: 30%;
-}
-
-.float{
-  float: left;
-  width: 49%;
-}
-
-.float>.row {
-  border: 2px solid rgb(138, 15, 15);
-  padding: 0;
-}
-
-.float>.row> * {
-  padding: 0;
-}
-
 .footer {
   background-color: black;
   padding: 10px;
@@ -67,11 +40,6 @@ thead {
 .card-border {
   border: 2px solid rgb(138, 15, 15);
   margin-bottom: 24px;
-}
-
-.seriesGame {
-  width: 101%;
-  overflow: hidden;
 }
 
 .carousel-arrow {
@@ -93,7 +61,7 @@ tr>td {
 
 @media screen and (min-width: 769px) {
   .navbar {
-    float: right;
+    text-align: right;
   }
   .ant-menu-item {
     font-size: 16px;
@@ -108,12 +76,14 @@ tr>td {
 
 .circle-img{
   border-radius: 50%;
-  height: 200px;
-  width: 200px;
+  height: 25vw;
+  width: 25vw;
   display: block;
   margin-left: auto;
   margin-right: auto;
-  margin-top:-100px;
+  margin-top:-12.5vw;
+  max-height: 300px;
+  max-width: 300px;
 }
 
 .player-info {
@@ -171,4 +141,31 @@ tr>td {
 
 .ant-message-notice-content {
   color:black
+}
+
+h2 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.game_carousel_heading {
+  background-color: rgb(138, 15, 15);
+  justify-content: center;
+  align-content: center;
+}
+
+.game_carousel_team_name {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  margin: 10px 0 15px 5px;
+}
+
+pre {
+  white-space: pre-wrap;       /* Since CSS 2.1 */
+  white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+  white-space: -pre-wrap;      /* Opera 4-6 */
+  white-space: -o-pre-wrap;    /* Opera 7 */
+  word-wrap: break-word;       /* Internet Explorer 5.5+ */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji', monospace;
 }

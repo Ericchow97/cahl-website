@@ -13,7 +13,7 @@ module.exports = override(
       "@text-color":"#fff",
       "@body-background":"#00002b",
       "@layout-body-background":  "#00002b",
-      "@menu-dark-item-active-bg": "none",
+      "@menu-dark-item-active-bg": "transparent",
       "@table-header-bg": "rgb(138, 15, 15)",
       "@primary-color": "rgb(138, 15, 15)",
       "@primary-1": "red",
@@ -28,7 +28,11 @@ module.exports = override(
       "@form-item-margin-bottom": "8px", 
       "@table-header-sort-bg": "darken(@table-header-bg, 5%)",
       "@modal-header-bg" : "@primary-color",
-      "@modal-content-bg" : "#000"
+      "@modal-content-bg" : "#000",
+      "@menu-dark-item-hover-bg" : "@primary-1",
+      "@tabs-hover-color": "#fff",
+      "@tabs-highlight-color": "#fff",
+      "@table-body-sort-bg": "none",
     }
   })
 );

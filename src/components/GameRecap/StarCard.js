@@ -1,6 +1,7 @@
 import React from 'react'
 import { Col } from 'antd'
 import { StarFilled } from '@ant-design/icons'
+import {Mobile} from '../../ResponsiveContextProvider'
 
 export const StarCard = (props) => {
 
@@ -11,9 +12,11 @@ export const StarCard = (props) => {
 
     return (
         <>
-            <Col span={5} className="three-stars-border" key={props.stars}>
-                {stars}
-                <img src={props.image} alt="player" width="95%" height="200px"/>
+            <Col span={Mobile() ? 8 : 7} className="three-stars-border" key={props.stars}>
+                <div width='100%'>
+                    {stars}
+                </div>
+                <img src={props.image} alt="player" style={{height: 'auto', maxHeight: '200px', width: '95%', maxWidth: '150px'}}/>
                 <h3>{props.name}</h3>
             </Col>
         </>

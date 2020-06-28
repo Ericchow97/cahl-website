@@ -1,10 +1,11 @@
-import React, {useState} from 'react';
-import { Table } from 'antd';
+import React, { useState } from 'react';
+import { Table, Row, Col } from 'antd';
+import { Mobile } from '../../ResponsiveContextProvider'
 
 const { Column } = Table;
 
 export const ScoringLeaders = (props) => {
-    const [playerImage, setImage] = useState(props.topScorers[0].image)
+    const [playerImage, setImage] = useState(`http://127.0.0.1:8000/media/${props.topScorers[0].image}`)
 
     const data = props.topScorers.map((player, i) => {
         return {
@@ -14,42 +15,46 @@ export const ScoringLeaders = (props) => {
             name: player.name,
             goals: player.goals,
             assists: player.assists,
-            points: player.points,
+            points: player.goals + player.assists,
             image: player.image
         }
     })
 
     const handleMouseOver = (record) => {
-        console.log(record)
-        setImage(record.image)
+        setImage(`http://127.0.0.1:8000/media/${record.image}`)
     }
 
     return (
         <>
-            {/*TODO: change float*/}
-            <div className="float" style={{width:"60%"}}>
-                <Table 
-                    dataSource={data}
-                    pagination={false}
-                    onRow={(record) => {
-                        return {
-                            onMouseEnter: () => handleMouseOver(record),
-                            onClick: () => props.handleClick(record)
-                        }
-                    }}
-                >
-                    <Column title="#" dataIndex="num" key="num" />
-                    <Column title="Name" dataIndex="name" key="name" />
-                    <Column title="G" dataIndex="goals" key="goals" />
-                    <Column title="A" dataIndex="assists" key="assists" />
-                    <Column title="Pts" dataIndex="points" key="points" />
-                </Table>
-            </div>
-            {/*TODO: change this to be mobile friendly and remove the class*/}
-            <div className ="center-float float" style={{width:"30%"}}>
-                <img src={playerImage} alt="player" width="100%"/>
-            </div>  
-        </>          
+            <Row gutter={12}>
+                <Col span={Mobile() ? 24 : 12}>
+                    <Table
+                        dataSource={data}
+                        pagination={false}
+                        onRow={(record) => {
+                            return {
+                                onMouseEnter: () => handleMouseOver(record),
+                                onTouchStart: () => handleMouseOver(record),
+                                onClick: () => props.handleClick(record)
+                            }
+                        }}
+                    >
+                        <Column width='15%' title="#" dataIndex="num" key="num" />
+                        <Column width='50%' title="Name" dataIndex="name" key="name" ellipsis={true} />
+                        <Column width='10%' title="G" dataIndex="goals" key="goals" />
+                        <Column width='10%' title="A" dataIndex="assists" key="assists" />
+                        <Column width='15%' title="Pts" dataIndex="points" key="points" />
+                    </Table>
+                </Col>
+                {!Mobile() &&
+                    <Col span={12} style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                        <span style={{ display: 'inline-block', verticalAlign: 'middle', height: '100%' }}></span>
+                        <img src={playerImage} alt="player" style={{ verticalAlign: 'middle', maxHeight: '330px', width: '100%', maxWidth: '250px' }} />
+                    </Col>
+                }
+            </Row>
+        </>
+
     )
 }
 

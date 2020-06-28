@@ -1,11 +1,12 @@
 import React, { useRef } from 'react';
-import { Row, Col, Carousel } from 'antd';
-import { SeriesGame } from './SeriesGame';
+import { Row, Carousel } from 'antd';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons'
-
+import { SeriesCarouselDisplay } from './SeriesCarouselDisplay'
+import { MobileOrTablet } from '../../ResponsiveContextProvider'
 
 export const SeriesCarousel = (props) => {
     const carousel = useRef(null);
+    const mobileView = MobileOrTablet()
 
     const handleClick = (e) => {
         if (e.target.dataset.icon === "left") {
@@ -15,46 +16,95 @@ export const SeriesCarousel = (props) => {
             carousel.current.next()
         }
     }
-    let gameSet1 = []
-    let gameSet2 = []
-    const setSeriesGames = (seriesScores) => {
-        // set a col for each game (7 games)
-        for (let i = 0; i < 7; i++) {
-            // first 4 games in first set, others in second set
-            if (i < 4) {
-                // if there is data for recent games, populate columns, else go with default
-                if (seriesScores[i]) {
-                    gameSet1.push(<Col span= {6} key={i} className="border-series"><SeriesGame  id={i + 1} home={props.team1Name} homeScore={seriesScores[i].game_result[0].team_score} away={props.team2Name} awayScore={seriesScores[i].game_result[1].team_score} /></Col>)
-                } else {
-                    gameSet1.push(<Col span= {6} key={i} className="border-series"><SeriesGame  id={i + 1} home={props.team1Name} homeScore="-" away={props.team2Name} awayScore="-" /></Col>)
-                }
-            } else {
-                if (seriesScores[i]) {
-                    gameSet2.push(<Col span= {8} key={i} className="border-series"><SeriesGame  id={i + 1} home={props.team1Name} homeScore={seriesScores[i].game_result[0].team_score} away={props.team2Name} awayScore={seriesScores[i].game_result[1].team_score} /></Col>)
-                } else {
-                    gameSet2.push(<Col span= {8} key={i} className="border-series"><SeriesGame  id={i + 1} home={props.team1Name} homeScore="-" away={props.team2Name} awayScore="-" /></Col>)
-                }
-            }
+    let gameSet = []
+    for (let i = 0; i < 7; i++) {
+        // if there is data for recent games, populate columns, else go with default
+        if (props.seriesGames[i]) {
+            gameSet.push({
+                id: i,
+                homeName: props.team1Name,
+                homeScore: props.seriesGames[i].game_result[0].team_score,
+                awayName: props.team2Name,
+                awayScore: props.seriesGames[i].game_result[1].team_score
+            })
+        } else {
+            gameSet.push({
+                id: i,
+                homeName: props.team1Name,
+                homeScore: '-',
+                awayName: props.team2Name,
+                awayScore: '-'
+            })
         }
     }
-    setSeriesGames(props.seriesGames)
+    
+    //split for mobile and desktop view
+    let carouselSplit = []
+    if (mobileView) {
+        carouselSplit = [3, 5, 7]
+    } else {
+        carouselSplit = [4, 7]
+    }
     return (
         <>
             <Row>
                 <Carousel ref={carousel}>
                     <div>
                         <Row className="carousel-row">
-                            {gameSet1}
+                            {gameSet.slice(0, carouselSplit[0]).map((game, key) => {
+                                return (
+                                    <SeriesCarouselDisplay
+                                        key={key}
+                                        span={mobileView ? 8 : 6}
+                                        id={game.id}
+                                        homeName={game.homeName}
+                                        homeScore={game.homeScore}
+                                        awayName={game.awayName}
+                                        awayScore={game.awayScore}
+                                    />
+                                )
+                            })}
                         </Row>
                     </div>
                     <div>
                         <Row className="carousel-row">
-                            {gameSet2}
+                            {gameSet.slice(carouselSplit[0], carouselSplit[1]).map((game, key) => {
+                                return (
+                                    <SeriesCarouselDisplay
+                                        key={key}
+                                        span={mobileView ? 12: 8}
+                                        id={game.id}
+                                        homeName={game.homeName}
+                                        homeScore={game.homeScore}
+                                        awayName={game.awayName}
+                                        awayScore={game.awayScore}
+                                    />
+                                )
+                            })}
                         </Row>
                     </div>
+                    {mobileView && 
+                        <div>
+                            <Row className="carousel-row">
+                                {gameSet.slice(carouselSplit[1], carouselSplit[2]).map((game, key) => {
+                                    return (
+                                        <SeriesCarouselDisplay
+                                            key={key}
+                                            span={12}
+                                            id={game.id}
+                                            homeName={game.homeName}
+                                            homeScore={game.homeScore}
+                                            awayName={game.awayName}
+                                            awayScore={game.awayScore}
+                                        />
+                                    )
+                                })}
+                            </Row>
+                        </div>
+                    }
                 </Carousel>
-                <LeftOutlined className="carousel-arrow left" onClick= {(e) => handleClick(e)} />
-                <RightOutlined className="carousel-arrow right" onClick= {(e) => handleClick(e)} />
+                <LeftOutlined className="carousel-arrow left" onClick={(e) => handleClick(e)} />
+                <RightOutlined className="carousel-arrow right" onClick={(e) => handleClick(e)} />
             </Row>
         </>
     );

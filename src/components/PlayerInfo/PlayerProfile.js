@@ -4,33 +4,29 @@ import { Divider } from 'antd';
 import { PlayerStatsTable } from './PlayerStatsTable';
 
 export const PlayerProfile = (props) => {
-
-  const [ playerStats, setPlayerStats ] = useState([])
-
-  // want to find the index of the player who was selected
-  const playerIndex = props.players.findIndex(player => player.id === parseInt(props.playerId))
-  const playerData = props.players[playerIndex]
+  const [playerTotalStats, setPlayerTotalStats] = useState([])
+  const playerStats = props.playerStatsData
 
   useEffect(() => {
-    const careerStats = [
-      {
-        key: '1',
-        team: 'CAHL Career',
-        games: 0,
-        goals: 0,
-        assists: 0,
-        points: 0,
-        wins: 0,
-        loss: 0,
-        ga: 0,
-        children: []
-      }
-    ]
-    //index into the player and grab the players Stats and add it to career stats
-    let currentSeriesTeamName = props.players[playerIndex].stats[0].team_name
+    const careerStats = {
+      key: '1',
+      team: 'CAHL Career',
+      games: 0,
+      goals: 0,
+      assists: 0,
+      points: 0,
+      wins: 0,
+      loss: 0,
+      ga: 0,
+      children: []
+    }
+    //set initial variables to use to group information per team
+    let seriesId = playerStats[0].series_id
+    let currentSeriesTeamName = playerStats[0].team_name
     let uniqueKey = 0
     let currentSeriesStats = {
       key: uniqueKey++,
+      series: seriesId,
       team: currentSeriesTeamName,
       games: 0,
       goals: 0,
@@ -41,39 +37,41 @@ export const PlayerProfile = (props) => {
       ga: 0
     }
 
-    props.players[playerIndex].stats.forEach(game => {
-      // add the stats to the career stats
-      careerStats[0].games += 1
-      careerStats[0].goals += game.goals
-      careerStats[0].assists += game.assists
-      careerStats[0].points += game.points
-      // if they are goalie handle the goalie cases
-      if (game.is_goalie) {
-        // if the player won, add a win as a goalie
-        if (game.win) {
-          careerStats[0].wins += 1
-        } 
-        // else add a loss for the goalie
-        else {
-          careerStats[0].loss += 1
+    for (let game = 0; game < playerStats.length; game++) {
+      // add the game stats to the career stats
+      careerStats.games += 1
+      careerStats.goals += playerStats[game].goals
+      careerStats.assists += playerStats[game].assists
+      careerStats.wins += playerStats[game].win
+      careerStats.loss += playerStats[game].is_goalie - playerStats[game].win
+      careerStats.ga += playerStats[game].ga
+
+      // add the current game stats into currentSeriesStats
+      currentSeriesStats.games += 1
+      currentSeriesStats.goals += playerStats[game].goals
+      currentSeriesStats.assists += playerStats[game].assists
+      currentSeriesStats.wins += playerStats[game].win
+      currentSeriesStats.loss += playerStats[game].is_goalie - playerStats[game].win
+      currentSeriesStats.ga += playerStats[game].ga
+
+      // if no next game or next team name is not the same, replace the currentSeriesTeamName and make a new instance of currentSeriesStats
+      if (!playerStats[game + 1] || (playerStats[game + 1] && currentSeriesTeamName !== playerStats[game + 1].team_name)) {
+        if (playerStats[game + 1]) {
+          seriesId = playerStats[game + 1].series_id
+          currentSeriesTeamName = playerStats[game + 1].team_name
         }
-        careerStats[0].ga += game.ga
-      }
-      //compare if the team name is the same as the one in the variable name
-      // if names are not the same, replace the currentSeriesTeamName and make a new instance of currentSeriesStats
-      if (currentSeriesTeamName !== game.team_name) {
-        currentSeriesTeamName = game.team_name
         //calculate GAA for the goalie and add to career stats
         if (currentSeriesStats.wins || currentSeriesStats.loss) {
-          currentSeriesStats.gaa = currentSeriesStats.ga / (currentSeriesStats.wins + currentSeriesStats.loss)
+          currentSeriesStats.gaa = Math.round((currentSeriesStats.ga / (currentSeriesStats.wins + currentSeriesStats.loss) + Number.EPSILON) * 100) / 100
         } else {
           currentSeriesStats.gaa = 0
         }
-        //push the current series stats into the career stats
-        careerStats[0].children.push(currentSeriesStats)
+        currentSeriesStats.points = currentSeriesStats.goals + currentSeriesStats.assists
+        careerStats.children.push(currentSeriesStats)
         //make new instance of currentSeriesStats
         currentSeriesStats = {
           key: uniqueKey++,
+          series: seriesId,
           team: currentSeriesTeamName,
           games: 0,
           goals: 0,
@@ -84,56 +82,30 @@ export const PlayerProfile = (props) => {
           ga: 0
         }
       }
-      // add the current game stats into currentSeriesStats
-      currentSeriesStats.games += 1
-      currentSeriesStats.goals += game.goals
-      currentSeriesStats.assists += game.assists
-      currentSeriesStats.points += game.points
-      if (game.is_goalie) {
-        // if the player won, add a win as a goalie
-        if (game.win) {
-          currentSeriesStats.wins += 1
-        } 
-        // else add a loss for the goalie
-        else {
-          currentSeriesStats.loss += 1
-        }
-        currentSeriesStats.ga += game.ga
-      }
-    })
-    // when finished, need to push in the last instance
-    //calculate GAA for the goalie and add to career stats
-    if (currentSeriesStats.wins || currentSeriesStats.loss) {
-      currentSeriesStats.gaa = currentSeriesStats.ga / (currentSeriesStats.wins + currentSeriesStats.loss)
-    } else {
-      currentSeriesStats.gaa = 0
     }
-    //push the current series stats into the career stats
-    careerStats[0].children.push(currentSeriesStats)
     //calculate GAA for the goalie and add to career stats
-    if (careerStats[0].wins || careerStats[0].loss) {
-      careerStats[0].gaa = careerStats[0].ga / (careerStats[0].wins + careerStats[0].loss)
+    if (careerStats.wins || careerStats.loss) {
+      careerStats.gaa = Math.round((careerStats.ga / (careerStats.wins + careerStats.loss) + Number.EPSILON) * 100) / 100
     } else {
-      careerStats[0].gaa = 0
+      careerStats.gaa = 0
     }
-    
-    setPlayerStats(careerStats)
-
-  }, [])
-  //TODO: change the player image size to match screen resolution
+    careerStats.points = careerStats.goals + careerStats.assists
+    console.log(careerStats)
+    setPlayerTotalStats([careerStats])
+  }, [playerStats])
   return (
     <>
       <Helmet>
-        <title>{`${playerData.name}`}</title>
+        <title>{`${props.playerData.name}`}</title>
       </Helmet>
-      <img src='https://nhl.bamcontent.com/images/arena/default/10.jpg' alt="background" width='100%'/>
-      <img src={playerData.image} alt="player" className='circle-img'/>
+      <img src='https://nhl.bamcontent.com/images/arena/default/10.jpg' alt="background" width='100%' />
+      <img src={`http://127.0.0.1:8000/media/${props.playerData.image}`} alt="player" className='circle-img' />
       <div className="player-info">
-        {playerData.name}
+        {props.playerData.name}
         <Divider type="vertical" />
-        {playerData.num}
+        {props.playerData.num}
       </div>
-      <PlayerStatsTable data={playerStats}/>
+      <PlayerStatsTable data={playerTotalStats} />
     </>
   )
 } 

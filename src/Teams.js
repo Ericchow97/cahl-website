@@ -6,7 +6,7 @@ import { CAHLTeams } from './components/Teams/CAHLTeams'
 import { Alert } from 'antd';
 
 export const Teams = (props) => {
-    const [ adminRedirect, setAdminRedirect ] = useState(false)
+    const [adminRedirect, setAdminRedirect] = useState(false)
 
     const handleClick = () => {
         setAdminRedirect(true)
@@ -15,15 +15,15 @@ export const Teams = (props) => {
     const handleClose = () => {
         props.setSeriesSuccess()
     }
-    
+
     return (
         <>
             <Helmet>
                 <title>Teams</title>
             </Helmet>
-            {adminRedirect && <Redirect push to = '/admin/createSeries'/>}
-            {props.seriesSuccess && 
-                <Alert 
+            {adminRedirect && <Redirect push to='/admin/createSeries' />}
+            {props.seriesSuccess &&
+                <Alert
                     message={props.seriesSuccess}
                     type="success"
                     closable
@@ -31,21 +31,20 @@ export const Teams = (props) => {
                     afterClose={handleClose}
                 />
             }
-            <CardTemplate 
-                loading={props.isLoading} 
-                header='Teams of CAHL' 
-                style={{textAlign: 'center'}} 
-                extra={props.isAdmin} 
-                buttonText='New Series' 
+            <CardTemplate
+                loading={props.allSeriesLoading}
+                header='Teams of CAHL'
+                style={{ textAlign: 'center' }}
+                extra={props.isAdmin}
+                buttonText='New Series'
                 handleClick={handleClick}
             >
                 <CAHLTeams
                     allSeries={props.allSeries}
                     isAdmin={props.isAdmin}
-                    isLoading={props.isLoading}
                 />
             </CardTemplate>
         </>
     )
-   
+
 }

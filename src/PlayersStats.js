@@ -7,36 +7,35 @@ import { SortingStats } from './components/SortingStats';
 import { CardTemplate } from './components/CardTemplate'
 
 export const PlayersStats = (props) => {
-  const [ redirect,  changeRedirect ] = useState(false)
-  const [ playerId, changeId ] = useState(null)
-  
+  const [redirect, changeRedirect] = useState(false)
+  const [playerId, changeId] = useState(null)
+
   const handleClick = (record) => {
-      changeRedirect(true)
-      changeId(record.id)
+    changeRedirect(true)
+    changeId(record.id)
   }
 
   return (
-      <>
-        <Helmet>
-          <title>Player Stats</title>
-        </Helmet>
-        {redirect && <Redirect push to={"/players/" + playerId} />}
-        <SortingStats tab1="Series Stats" tab2="All Time Stats">
-          <CardTemplate loading={props.isLoading} header="Current Series Stats">
-            <SeriesStats 
-              activePlayersStats={props.activePlayersStats}
-              activeSeries={props.activeSeries}
-              handleClick={handleClick}
-            />
-          </CardTemplate>
-          <CardTemplate loading={props.isLoading} header="All Time Stats">
-            <AllTimeStats
-              players={props.players} 
-              isLoading={props.isLoading}
-              handleClick={handleClick}
-            />
-          </CardTemplate>
-        </SortingStats>
-      </>
+    <>
+      <Helmet>
+        <title>Player Stats</title>
+      </Helmet>
+      {redirect && <Redirect push to={"/players/" + playerId} />}
+      <SortingStats tab1="Series Stats" tab2="All Time Stats">
+        <CardTemplate loading={props.homeLoading} header="Current Series Stats">
+          <SeriesStats
+            currentSeries={props.currentSeries}
+            currentSeriesStats={props.currentSeriesStats}
+            handleClick={handleClick}
+          />
+        </CardTemplate>
+        <CardTemplate loading={props.statsLoading} header="All Time Stats">
+          <AllTimeStats
+            allPlayersStats={props.allPlayersStats}
+            handleClick={handleClick}
+          />
+        </CardTemplate>
+      </SortingStats>
+    </>
   )
 }

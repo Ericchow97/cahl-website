@@ -5,9 +5,10 @@ import { AdminPageInstance } from './components/AdminPage/AdminPageInstance'
 import { CardTemplate } from './components/CardTemplate'
 
 export const AdminPage = (props) => {
+  //TODO: Set up fetch for more games
   if (!props.isAdmin) {
     return (
-      <Redirect push to='/' />
+      <Redirect push to='/login' />
     )
   } else {
     return (
@@ -15,7 +16,7 @@ export const AdminPage = (props) => {
         <Helmet>
           <title>Admin</title>
         </Helmet>
-        <CardTemplate loading={props.isLoading} header={"Admin Page"}>
+        <CardTemplate loading={props.allSeriesLoading || props.gamesLoading} header={"Admin Page"}>
           <AdminPageInstance
             allSeries={props.allSeries}
             allGames={props.allGames}
