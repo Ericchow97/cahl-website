@@ -1,12 +1,11 @@
 import React from 'react';
 import { Link } from "react-router-dom";
-import { Menu, Row, Col} from 'antd';
+import { Menu, Row, Col } from 'antd';
 import logo from '../assets/CAHLLogo.png'
 import logoText from '../assets/CAHLLogoText.png'
 import { MenuOutlined } from '@ant-design/icons'
 
 export const NavigationBar = (props) => {
-  //TODO: menu item remains highlighted after selected, and no hover color
   return (
     <>
       <Row className="gradient">
@@ -14,11 +13,11 @@ export const NavigationBar = (props) => {
           <Link to="/">
             <img
               alt=""
-              src= {logo}
+              src={logo}
               width="50px"
               height="50px"
             />
-            <img 
+            <img
               alt="Logo Text"
               src={logoText}
               height="50px"
@@ -26,16 +25,15 @@ export const NavigationBar = (props) => {
             />
           </Link>
         </Col>
-        {/*TODO: change float (I think theres a CSS property better than float) */}
-        <Col xs={2} md={15} style={{float:"right"}}>
+        <Col xs={2} md={15}>
           <Menu
-              theme="dark"
-              mode="horizontal"
-              style={{ lineHeight: '64px', background: "none"}}
-              className="navbar"
-              overflowedIndicator= {
-                <MenuOutlined />
-              }
+            theme="dark"
+            mode="horizontal"
+            style={{ lineHeight: '64px', background: "none" }}
+            className="navbar"
+            overflowedIndicator={
+              <MenuOutlined />
+            }
           >
             <Menu.Item key="/">
               <Link to="/">Home</Link>
@@ -49,14 +47,14 @@ export const NavigationBar = (props) => {
             <Menu.Item key="/gameRecap">
               <Link to="/gameRecap">Recap</Link>
             </Menu.Item>
-            {props.isAdmin && 
-            <Menu.Item key="/logout">
-              <Link to="/admin">Admin</Link>
-            </Menu.Item>
+            {props.isAdmin &&
+              <Menu.Item key="/logout">
+                <Link to="/admin">Admin</Link>
+              </Menu.Item>
             }
           </Menu>
         </Col>
-      </Row>         
+      </Row>
     </>
   )
 }

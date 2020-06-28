@@ -1,55 +1,27 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { StatsTable } from './StatsTable'
 
 export const AllTimeStats = (props) => {
-  const [ allPlayersStats, setAllPlayersStats ] = useState([])
-
-  useEffect(() => {
-    const playersStats = props.players.map((currPlayer, i) => {
-      const playerStats = {
-        'games': 0, 
-        'goals': 0, 
-        'assists': 0, 
-        'points': 0, 
-        'wins': 0,
-        'loss': 0
-      };
-      let goalieGames = 0
-      let ga = 0
-      currPlayer.stats.forEach(stats => {
-        playerStats['games'] += 1;
-        playerStats['goals'] += stats.goals;
-        playerStats['assists'] += stats.assists;
-        playerStats['points'] += stats.points;
-        if (stats.is_goalie) {
-          goalieGames += 1;
-          if (stats.win) {
-            playerStats['wins'] += 1
-          } else {
-            playerStats['loss'] += 1
-          }
-          ga += stats.ga;
-        }
-      })
-      if (goalieGames > 0) {
-        playerStats.gaa = Math.round((ga/goalieGames + Number.EPSILON) * 100) / 100
-      } else {
-        playerStats.gaa = 0
-      }
-      const playerInfo = {
-        'key': i,
-        'id':currPlayer.id,
-        'num': currPlayer.num,
-        'player': currPlayer.name
-      }
-      if (playerInfo.player === 'Eric Chow') {
-        playerInfo.num = String.fromCharCode(960)
-      }
-      const player = Object.assign({}, playerInfo, playerStats)
-      return player
-    })
-    setAllPlayersStats(playersStats)
-  }, [props.isLoading])
+  const allPlayersStats = props.allPlayersStats.map((player, i) => {
+    const playerStats = {
+      key: i,
+      id: player.id,
+      num: player.num,
+      player: player.name,
+      games: player.games,
+      goals: player.goals,
+      assists: player.assists,
+      points: player.goals + player.assists,
+      wins: player.wins,
+      loss: player.is_goalie - player.wins,
+    }
+    if (player.is_goalie > 0) {
+      playerStats.gaa = Math.round((player.ga / player.is_goalie + Number.EPSILON) * 100) / 100
+    } else {
+      playerStats.gaa = 0
+    }
+    return playerStats
+  });
 
   return (
     <StatsTable data={allPlayersStats} handleClick={props.handleClick} />

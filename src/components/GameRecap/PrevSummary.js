@@ -1,25 +1,55 @@
-import React from 'react'
-import { List } from 'antd';
+import React, { useState } from 'react'
+import InfiniteScroll from 'react-infinite-scroller';
+import { List, Spin } from 'antd';
 
 export const PrevSummary = (props) => {
+  const [gameIds, setGameIds] = useState([20, 40])
+  const [isLoading, setLoading] = useState(false)
+  const [hasMore, setHasMore] = useState(true)
+
   const data = props.allGames.map((gameData, i) => {
     return {
       id: gameData.id,
       title: `${gameData.game_result[0].team_name} vs ${gameData.game_result[1].team_name} - Game ${gameData.num}`
     }
   })
-  //TODO: Display with pagination
+
+  const loadMore = async () => {
+    setLoading(true)
+    if (gameIds[0] > props.allGames[0].id) {
+      setHasMore(false)
+      setLoading(false)
+      return
+    }
+    const newGames = await (await (fetch(`http://127.0.0.1:8000/game/?game_ids=${gameIds[0]},${gameIds[1]}`))).json()
+    props.setAllGames(allGames => [...allGames, ...newGames])
+    setGameIds([gameIds[1], Math.min(gameIds[1] + (gameIds[1] - gameIds[0]), props.allGames[0].id)])
+    setLoading(false)
+  }
+
   return (
-    <List
+    <InfiniteScroll
+      initialLoad={false}
+      loadMore={loadMore}
+      hasMore={!isLoading && hasMore}
+      useWindow={false}
+    >
+      <List
         itemLayout="horizontal"
         dataSource={data}
         renderItem={item => (
           <List.Item onClick={() => props.handleClick(item.id)}>
-              <List.Item.Meta
+            <List.Item.Meta
               title={item.title}
-              />
+            />
           </List.Item>
         )}
-    />
+      />
+      {isLoading &&
+        <div style={{ textAlign: 'center' }}>
+          <Spin />
+        </div>
+      }
+    </InfiniteScroll>
   )
 }
