@@ -40,8 +40,6 @@ export const PictureUpload = (props) => {
     });
   };
 
-  //TODO: evaluate className
-
   return (
     <>
       {imageUrl && <img src={imageUrl} alt="avatar" className='circle-img' style={{marginTop: '0px', marginBottom: '25px'}} />}

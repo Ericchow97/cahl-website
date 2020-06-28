@@ -4,48 +4,57 @@ import { Helmet } from 'react-helmet'
 import { CardTemplate } from './components/CardTemplate'
 import { GameSummary } from './components/GameRecap/GameSummary'
 import { PrevSummary } from './components/GameRecap/PrevSummary'
-import { Row, Col, Alert } from 'antd';
+import { Row, Col, Alert, Button, Drawer } from 'antd';
 import { useParams } from 'react-router-dom'
 
-
 export const GameRecap = (props) => {
-  const [ adminRedirect, setAdminRedirect ] = useState(false)
-  const [ redirect,  changeRedirect ] = useState(false)
-  const { paramId } = useParams()
-  const [ gameId, changeId ] = useState(paramId ? paramId : props.allGames.length)
-  // used for rendering on click of other game summaries
-  const [ isLoading, setLoading ] = useState(true)
-  const [ threeStars, setThreeStars ] = useState([])
+  let { gameId } = useParams()
 
-  //API request to server to obtain three stars
+  const [adminRedirect, setAdminRedirect] = useState(false)
+  const [redirect, changeRedirect] = useState(false)
+
+  const [currentGameId, changeId] = useState(gameId)
+  const [gameInfo, setGameInfo] = useState({})
+  const [invalidGame, setInvalidGame] = useState(false)
+
+  // Drawer variable
+  const [visible, setVisible] = useState(false)
+
   useEffect(() => {
-    const fetchThreeStarsData = async () => {
-      const firstStarRes = await fetch(`${gameData.game_summary.first_star}?player_info=true`)
-      const firstStar = await firstStarRes.json()
-      const secondStarRes = await fetch(`${gameData.game_summary.second_star}?player_info=true`)
-      const secondStar = await secondStarRes.json()
-      const thirdStarRes = await fetch(`${gameData.game_summary.third_star}?player_info=true`)
-      const thirdStar = await thirdStarRes.json()
-      setThreeStars(firstStar)
-      setThreeStars(threeStars => [threeStars, secondStar])
-      setThreeStars(threeStars => [...threeStars, thirdStar])
-      setLoading(false)
+    const fetchGame = async () => {
+      try {
+        const gameRes = await fetch(`http://127.0.0.1:8000/game/${currentGameId}/`)
+        if (gameRes.ok) {
+          setGameInfo(await (gameRes).json())
+          setInvalidGame(false)
+        } else {
+          throw new Error()
+        }
+      }
+      catch {
+        setInvalidGame(true)
+      }
     }
-    const gameData = props.allGames[props.allGames.length - gameId]
-    // if its has a value, then get the data
-    if (gameData && gameData.game_summary) {
-      fetchThreeStarsData()
-    } else {
-      setThreeStars([])
-      setLoading(false)
+    if (!currentGameId && props.allGames[0]) {
+      changeId(props.allGames[0].id)
     }
-  }, [gameId, props.isLoading])
+    const gameIndex = props.allGames.findIndex(game => game.id === parseInt(currentGameId))
+    let game = props.allGames[gameIndex]
+    // if previous games and game summary exist, then get the data
+    if (game) {
+      setInvalidGame(false)
+      setGameInfo(game)
+    } else if (currentGameId) {
+      game = fetchGame()
+    }
+  }, [currentGameId, props.allGames])
 
   const handleClick = (id) => {
-    changeId(id)
-    changeRedirect(true)
-    setThreeStars([])
-    setLoading(true)
+    if (id !== currentGameId) {
+      changeId(id)
+      changeRedirect(true)
+      setVisible(false)
+    }
   }
 
   const handleAdminClick = () => {
@@ -56,59 +65,80 @@ export const GameRecap = (props) => {
     props.setGameSuccess()
   }
 
-  // initially set the id to the most recent game
-  useEffect(() => {
-      changeId(props.allGames.length)
-  }, [props.allGames])
-  
+  //Mobile Drawer functions
+  const showDrawer = () => {
+    setVisible(true)
+  }
+
+  const onClose = () => {
+    setVisible(false)
+  }
+
   return (
     <>
       <Helmet>
-        <title>{gameId ? `Game Recap #${gameId}` : `Game Recap`}</title>
+        <title>{`Game Recap`}</title>
       </Helmet>
-      {redirect && <Redirect push to={`/gameRecap/${gameId}`}/>}
-      {adminRedirect && <Redirect push to = {`/gameRecap/${gameId}/admin/editGame`}/>}
-      {props.gameSuccess && 
-        <Alert 
-            message={props.gameSuccess}
-            type="success"
-            closable
-            showIcon
-            afterClose={handleClose}
+      {redirect && <Redirect push to={`/gameRecap/${currentGameId}`} />}
+      {adminRedirect && <Redirect push to={`/gameRecap/${currentGameId}/admin/editGame`} />}
+      {props.gameSuccess &&
+        <Alert
+          message={props.gameSuccess}
+          type="success"
+          closable
+          showIcon
+          afterClose={handleClose}
         />
       }
       <Row gutter={16}>
-        <Col span={18}>
+        <Col>
           <CardTemplate
-            loading={props.isLoading || isLoading}
-            header="Game Recap" 
-            extra={props.isAdmin} 
-            buttonText='Edit Game' 
+            loading={props.gamesLoading || (!gameInfo.game_result && !invalidGame)}
+            header="Game Recap"
+            extra={props.isAdmin}
+            buttonText='Edit Game'
             handleClick={handleAdminClick}
+            disabled={invalidGame}
           >
-            <GameSummary
-                gameId={gameId}
-                gameData={props.allGames[props.allGames.length - gameId]}
-                isAdmin={props.isAdmin}
-                threeStars={threeStars}
-                isLoading={isLoading}
-                setLoading={setLoading}
-            />
-            </CardTemplate>
-        </Col>
-        <Col span={6}>
-          <CardTemplate 
-            loading={props.isLoading}
-            header="Previous Recaps" 
-            headSize="20px"
-          >
-            <PrevSummary 
-                handleClick={handleClick}
-                allGames={props.allGames}
-            />
+            {invalidGame ? (
+              <h1>This game does not exist</h1>
+            ) : (
+                <GameSummary
+                  gameInfo={gameInfo}
+                />
+              )
+            }
           </CardTemplate>
+        </Col>
+        <Col>
+          <Button
+            type="primary"
+            style={{ marginBottom: '24px' }}
+            block
+            onClick={showDrawer}
+          >
+            See Previous Recaps
+          </Button>
+          <Drawer
+            title="Previous Recaps"
+            placement="right"
+            headerStyle={{
+              backgroundImage: "linear-gradient(to right, rgb(30,30,30) , red)",
+              fontSize: "24px"
+            }}
+            bodyStyle={{ backgroundColor: "black", padding: '8px' }}
+            closable={false}
+            onClose={onClose}
+            visible={visible}
+          >
+            <PrevSummary
+              handleClick={handleClick}
+              allGames={props.allGames}
+              setAllGames={props.setAllGames}
+            />
+          </Drawer>
         </Col>
       </Row>
     </>
-  )   
+  )
 }

@@ -9,12 +9,12 @@ import { CardTemplate } from './components/CardTemplate'
 
 export const Home = (props) => {
   // require call to API for scoring leaders and recap of game
-  const [ playerRedirect,  changePlayerRedirect ] = useState(false)
-  const [ adminRedirect, setAdminRedirect ] = useState(false)
+  const [playerRedirect, changePlayerRedirect] = useState(false)
+  const [adminRedirect, setAdminRedirect] = useState(false)
 
-  const [ playerId, changeId ] = useState(null)
-  const [ gameSummaryRedirect, changeGameSummaryRedirect ] = useState(false)
-  
+  const [playerId, changeId] = useState(null)
+  const [gameSummaryRedirect, changeGameSummaryRedirect] = useState(false)
+
   const handleClick = (record) => {
     if (record.target && record.target.name === 'gameSummary') {
       changeGameSummaryRedirect(true)
@@ -27,46 +27,45 @@ export const Home = (props) => {
   const handleAdminClick = () => {
     setAdminRedirect(true)
   }
+
   return (
     <>
       <Helmet>
         <title>Home</title>
       </Helmet>
-        {gameSummaryRedirect && <Redirect push to='/gameRecap/' />}
-        {playerRedirect && <Redirect push to={"/players/" + playerId} />}
-        {adminRedirect && <Redirect push to = '/admin/newGame'/>}     
-        <Row gutter={24}>
-          <Col lg={12}>
-            <CardTemplate 
-              loading={props.isLoading}
-              header="Current Series" 
-              style={{textAlign:"center"}} 
-              extra={props.isAdmin} 
-              buttonText='New Game' 
-              handleClick={handleAdminClick}
-            >
-              <SeriesHome
-                activeSeries ={props.activeSeries}
-              />
-            </CardTemplate>
-          </Col>
-          <Col lg={12} style={{ width:'100%' }}>
-            <CardTemplate loading={props.isLoading} header="Scoring Leaders">
-              <ScoringLeaders 
-                  topScorers={props.topScorers}
-                  isLoading={props.isLoading}
-                  handleClick={handleClick} 
-              />
-            </CardTemplate>
-          </Col>
-        </Row>
-        <CardTemplate loading={props.isLoading} header="Game Recap">
-            <GameRecapSummary 
-                recentGame={props.recentGame}
-                recentStars={props.recentStars}
-                handleClick={handleClick}
+      {gameSummaryRedirect && <Redirect push to='/gameRecap/' />}
+      {playerRedirect && <Redirect push to={"/players/" + playerId} />}
+      {adminRedirect && <Redirect push to='/admin/newGame' />}
+      <Row gutter={24}>
+        <Col lg={12}>
+          <CardTemplate
+            loading={props.homeLoading}
+            header="Current Series"
+            style={{ textAlign: "center" }}
+            extra={props.isAdmin}
+            buttonText='New Game'
+            handleClick={handleAdminClick}
+          >
+            <SeriesHome
+              currentSeries={props.currentSeries}
             />
-        </CardTemplate>
+          </CardTemplate>
+        </Col>
+        <Col lg={12} style={{ width: '100%' }}>
+          <CardTemplate loading={props.homeLoading} header="Scoring Leaders">
+            <ScoringLeaders
+              topScorers={props.topScorers}
+              handleClick={handleClick}
+            />
+          </CardTemplate>
+        </Col>
+      </Row>
+      <CardTemplate loading={props.homeLoading} header="Game Recap">
+        <GameRecapSummary
+          recentGame={props.recentGame}
+          handleClick={handleClick}
+        />
+      </CardTemplate>
     </>
   )
 }

@@ -1,25 +1,19 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Form, Checkbox, Input, Select } from 'antd';
 
 const { Option } = Select
 const { TextArea } = Input
 export const CreateGameSummary = (props) => {
-  const [ hideGameSummary, setGameSummaryHidden ] = useState(false)
 
-  //TODO: MAKE game summary list only list to selected players
-  const handleChange = () => {
-    const ref = props.formRef.getFieldValue(['game_summary', 'display'])
-    setGameSummaryHidden(ref)
-  }
-
+  //TODO: MAKE game summary three stars list only list to selected players
   const formItemLayout = {
     labelCol: {
       xs: { span: 24 },
-      sm: { span: 4},
+      sm: { span: 4 },
     },
     wrapperCol: {
       xs: { span: 24 },
-      sm: { span: 20},
+      sm: { span: 20 },
     },
   };
   const otherLayout = {
@@ -38,20 +32,20 @@ export const CreateGameSummary = (props) => {
     }
   }
 
-  const starList=['First Star', 'Second Star', 'Third Star']
+  const starList = ['First Star', 'Second Star', 'Third Star']
   //TODO: Update dropdown when name is selected, see if you can use getfields from ant FORM
   return (
     <>
       <h2>Game Summary</h2>
       <Form.Item
         {...otherLayout}
-        name={['game_summary', 'display']}
+        name={['game_summary', 'hidden']}
         validateTrigger={['onChange', 'onBlur']}
         valuePropName='checked'
       >
-        <Checkbox onChange={handleChange}>{hideGameSummary ? 'Show Game Summary' : 'Hide Game Summary'} </Checkbox>
+        <Checkbox >{props.hideGameSummary ? 'Show Game Summary' : 'Hide Game Summary'} </Checkbox>
       </Form.Item>
-      <div style={{display: hideGameSummary && 'none'}}>
+      <div style={{ display: props.hideGameSummary && 'none' }}>
         <Form.Item
           {...formItemLayout}
           label='Title'
@@ -59,7 +53,7 @@ export const CreateGameSummary = (props) => {
           validateTrigger={['onChange', 'onBlur']}
           rules={[
             {
-              required: !hideGameSummary,
+              required: !props.hideGameSummary,
               whitespace: true,
               message: "Please input a game title",
             },
@@ -77,7 +71,7 @@ export const CreateGameSummary = (props) => {
           validateTrigger={['onChange', 'onBlur']}
           rules={[
             {
-              required: !hideGameSummary,
+              required: !props.hideGameSummary,
               whitespace: true,
               message: "Please input a game summary",
             },
@@ -86,7 +80,7 @@ export const CreateGameSummary = (props) => {
           <TextArea
             autoComplete='off'
             placeholder="Game Summary"
-            autoSize={{minRows: 4, maxRows: 8}}
+            autoSize={{ minRows: 4, maxRows: 8 }}
           />
         </Form.Item>
         <Form.List name={['game_summary', 'star']}>
@@ -103,12 +97,7 @@ export const CreateGameSummary = (props) => {
                     validateTrigger={['onChange', 'onBlur']}
                     rules={[
                       {
-                        type: 'enum',
-                        enum: props.playerList,
-                        message: 'Player does not exist, please check your spelling'
-                      },
-                      {
-                        required: !hideGameSummary,
+                        required: !props.hideGameSummary,
                         whitespace: true,
                         message: "Please input player's name",
                       },
@@ -117,11 +106,11 @@ export const CreateGameSummary = (props) => {
                     <Select
                       showSearch
                       onInputKeyDown={e => handleSelect(e)}
-                      style={{ color: 'black', padding: '0'}}
+                      style={{ color: 'black', padding: '0' }}
                       placeholder="Player Name"
                     >
-                      {props.allPlayers.map(player => (
-                        <Option key={player.id} style={{ color: 'black' }} value={player.name}>{player.name}</Option>
+                      {props.allPlayers.map((player, i) => (
+                        <Option key={i} style={{ color: 'black' }} value={player.name}>{player.name}</Option>
                       ))}
                     </Select>
                   </Form.Item>
