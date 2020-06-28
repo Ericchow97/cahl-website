@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import HeaderLogo from './assets/charity-hockey-banner.jpg'
-import { BrowserRouter as Router,  Switch,  Route } from "react-router-dom";
+import { Switch, Route } from "react-router-dom";
 import { Helmet } from 'react-helmet'
 import { Layout } from 'antd';
+import { MobileOrTablet } from './ResponsiveContextProvider'
 import { Home } from './Home';
 import { PlayersStats } from './PlayersStats';
 import { Teams } from './Teams';
@@ -23,291 +24,211 @@ const App = () => {
   const { Header, Content } = Layout;
 
   // variables of states to be passed to other components
-  const [ currSeriesNum, setSeriesNum ] = useState(0)
-  const [ allSeries, setAllSeries ] = useState([])
-
-  const [ activePlayers, setActivePlayers ] = useState([])
-  const [ activeSeries, setActiveSeries ] = useState([])
-  const [ allGames, setAllGames ] = useState([])
-  const [ recentStars, setRecentStars ] = useState([])
-  const [ isLoading, setLoading ] = useState(true)
-  const [ isAdmin, setAdmin ] = useState(window.localStorage.getItem('admin'))
+  const [isAdmin, setAdmin] = useState(window.localStorage.getItem('admin'))
 
   //Reload State: when admin submits and is successful, have a refresh of all data
-  const [ successfulSubmission, setSuccessfulSubmission ] = useState(false)
-  const [ seriesSuccess, setSeriesSuccess ] = useState()
-  const [ gameSuccess, setGameSuccess ] = useState()
-  const [ players, setAllPlayers ] = useState([])
+  const [successfulSubmission, setSuccessfulSubmission] = useState(false)
+  const [seriesSuccess, setSeriesSuccess] = useState()
+  const [gameSuccess, setGameSuccess] = useState()
 
-  //TODO: change all alerts to messages
-  //TODO: change fetch functions to reduce reload time
-  //API request to server to obtain all relevant information
+  // TODO: change all alerts to messages
+  // TODO: change fetch url when have server, and image urls
+
+  // Home Page Variables
+  const [currentSeries, setCurrentSeries] = useState([])
+  const [recentGame, setRecentGame] = useState({})
+  const [topScorers, setTopScorers] = useState([])
+  const [homeLoading, setHomeLoading] = useState(true)
+
+  // Stats page Variables
+  const [currentSeriesStats, setCurrentSeriesStats] = useState([])
+  const [allPlayers, setAllPlayers] = useState([])
+  const [playersLoading, setPlayersLoading] = useState(true)
+
+  // Teams page variables
+  const [allSeries, setAllSeries] = useState([])
+  const [allSeriesLoading, setAllSeriesLoading] = useState(true)
+
+  // Game page variables
+  const [allGames, setAllGames] = useState([])
+  const [gamesLoading, setGamesLoading] = useState(true)
+
   useEffect(() => {
-    const fetchSeriesData = async () => {
-      const seriesDataRes = await fetch(`http://127.0.0.1:8000/series/`)
-      const seriesData = await seriesDataRes.json()
-      const currentSeriesData =  seriesData[0]
-      const seriesNum = currentSeriesData.id
-      const currPlayersStatsRes = await fetch(`http://127.0.0.1:8000/players/?series_id=${seriesNum}`)
-      const currPlayersStats = await currPlayersStatsRes.json()
-      const gameListRes = await fetch(`http://127.0.0.1:8000/game/`)
-      const gameList = await gameListRes.json()
-      // if the recent game has a game summary, update the most recent stars
-      if (gameList[0].game_summary) {
-        const firstStarRes = await fetch(`${gameList[0].game_summary.first_star}?player_info=true`)
-        const firstStar = await firstStarRes.json()
-        const secondStarRes = await fetch(`${gameList[0].game_summary.second_star}?player_info=true`)
-        const secondStar = await secondStarRes.json()
-        const thirdStarRes = await fetch(`${gameList[0].game_summary.third_star}?player_info=true`)
-        const thirdStar = await thirdStarRes.json()
-        setRecentStars(firstStar)
-        setRecentStars(recentStars => [recentStars, secondStar])
-        setRecentStars(recentStars => [...recentStars, thirdStar])
-      }  else {
-        setRecentStars([])
+    // API request for Home page
+    const fetchCurrentSeriesData = async () => {
+      // get series information for home current series
+      const currentSeriesNumRes = fetch(`http://127.0.0.1:8000/series/?only_id=True`)
+      const currentSeriesFetch = fetch(`http://127.0.0.1:8000/series/?first=True`)
+      // get current series information for stat totals & scoring leaders
+      const currentSeriesStatsRes = (await (await fetch(`http://127.0.0.1:8000/players/?series_id=${(await (await currentSeriesNumRes).json()).id}`)).json())
+      const currentSeriesRes = (await (await currentSeriesFetch).json())[0]
+      setCurrentSeries(currentSeriesRes)
+      const topScorers = currentSeriesStatsRes.sort((a, b) => {
+        if ((a.goals + a.assists) - (b.goals + b.assists) === 0) {
+          if (a.goals - b.goals === 0) {
+            return b.assists - a.assists
+          }
+          return b.goals - a.goals
+        }
+        return (b.goals + b.assists) - (a.goals + a.assists)
+      }).slice(0, 5)
+      if (currentSeriesRes.games.length > 0) {
+        setRecentGame(currentSeriesRes.games[currentSeriesRes.games.length - 1])
       }
-      setSeriesNum(seriesNum)
-      setAllSeries(seriesData)
-      setActiveSeries(currentSeriesData)
-      setActivePlayers(currPlayersStats)
-      setAllGames(gameList)
-      setLoading(false)
-      setSuccessfulSubmission(false)
+      setCurrentSeriesStats(currentSeriesStatsRes)
+      setTopScorers(topScorers)
+      setHomeLoading(false)
     }
-
-    const fetchPlayerData = async () => {
-      const allPlayersRes = await fetch(`http://127.0.0.1:8000/players/`)
-      const allPlayers = await allPlayersRes.json()
-      setAllPlayers(allPlayers)
+    // API request for stats page
+    const fetchStatsData = async () => {
+      const allPlayersRes = await (await fetch(`http://127.0.0.1:8000/players/`)).json()
+      // Add special player numbers
+      for (let i = 0; i < allPlayersRes.length; i++) {
+        if (allPlayersRes[i].name === 'Oscar Chow') {
+          allPlayersRes[i].num = String.fromCharCode(960)
+        } else if (allPlayersRes[i].name === 'Chad Wenzel') {
+          allPlayersRes[i].num = String.fromCharCode(937)
+        }
+      }
+      setAllPlayers(allPlayersRes)
+      setPlayersLoading(false)
     }
-    setLoading(true)
-    fetchPlayerData()
-
-    fetchSeriesData()
+    // API request for Teams page
+    const fetchAllSeriesData = async () => {
+      // fetch all series
+      const allSeriesRes = await (await fetch(`http://127.0.0.1:8000/series/`)).json()
+      setAllSeries(allSeriesRes)
+      setAllSeriesLoading(false)
+    }
+    //API request for Recap Page
+    const fetchGameData = async () => {
+      const allGamesRes = await (await fetch(`http://127.0.0.1:8000/game/?game_ids=0,20`)).json()
+      setAllGames(allGamesRes)
+      setGamesLoading(false)
+    }
+    fetchCurrentSeriesData()
+    fetchAllSeriesData()
+    fetchStatsData()
+    fetchGameData()
 
   }, [successfulSubmission])
-
-  //TODO: move to the on component load so functions only run once
-  // return new array with [num, player name, GP, G, A, Pts, W, L, GAA, Image]
-  const getActivePlayers = () => {
-    return (
-      activePlayers.map(activePlayer => {
-        const playerStats = {
-          'games': 0, 
-          'goals': 0, 
-          'assists': 0, 
-          'points': 0, 
-          'wins': 0,
-          'loss': 0,
-          'ga': 0,
-          'goalieGames': 0
-        };
-        activePlayer.stats.forEach(stats => {
-          playerStats['games'] += 1;
-          playerStats['goals'] += stats.goals;
-          playerStats['assists'] += stats.assists;
-          playerStats['points'] += stats.points;
-          if (stats.is_goalie) {
-            playerStats['goalieGames'] += 1;
-            if (stats.win) {
-              playerStats['win'] += 1;
-            }
-            playerStats['ga'] += stats.ga;
-          }
-        })
-        const playerInfo = {
-          'id': activePlayer.id,
-          'num': activePlayer.num,
-          'name': activePlayer.name,
-          'image': activePlayer.image,
-          'team': activePlayer.current_team
-        }
-        if (playerInfo.name === 'Eric Chow') {
-          playerInfo.num = String.fromCharCode(960)
-        }
-        const player = Object.assign({}, playerInfo, playerStats)
-        return player
-      })
-    )
-  }
-
-  const mergeSort = (arr) =>  {
-    // No need to sort the array if the array only has one element or empty
-    if (arr.length <= 1) {
-      return arr;
-    }
-    // In order to divide the array in half, we need to figure out the middle
-    const middle = Math.floor(arr.length / 2);
-  
-    // This is where we will be dividing the array into left and right
-    const left = arr.slice(0, middle);
-    const right = arr.slice(middle);
-  
-    // Using recursion to combine the left and right
-    return merge(
-      mergeSort(left), mergeSort(right)
-    );
-  }
-
-  function merge (left, right) {
-    let resultArray = [], leftIndex = 0, rightIndex = 0;
-  
-    // We will concatenate values into the resultArray in order
-    while (leftIndex < left.length && rightIndex < right.length) {
-      if (left[leftIndex].points > right[rightIndex].points) {
-        resultArray.push(left[leftIndex]);
-        leftIndex++; // move left array cursor
-      } else {
-        resultArray.push(right[rightIndex]);
-        rightIndex++; // move right array cursor
-      }
-    }
-  
-    // We need to concat here because there will be one element remaining
-    // from either left OR the right
-    return resultArray
-            .concat(left.slice(leftIndex))
-            .concat(right.slice(rightIndex));
-  }
-
-  const activePlayersStats = getActivePlayers()
-  const topScorers = mergeSort(activePlayersStats).slice(0,5)
 
   //General TODO: update alt for img tags
   return (
     <>
-    <Router>
       <Helmet titleTemplate='%s | CAHL'>
       </Helmet>
       <Layout>
-        <img src={HeaderLogo} alt="CAHL Header" width="100%"/>
-        <Header style={{padding:"0"}}>
-          <NavigationBar 
+        <img src={HeaderLogo} alt="CAHL Header" width="100%" />
+        <Header style={{ padding: "0" }}>
+          <NavigationBar
             isAdmin={isAdmin}
           />
         </Header>
-        <Content style={{padding: "0 50px"}}>
+        <Content style={{ padding: MobileOrTablet() ? "0 20px" : "0 50px" }}>
           <Switch>
-            <Route exact path="/" render={() => 
-              <Home 
-                isLoading={isLoading}
+            <Route exact path="/" render={() =>
+              <Home
                 isAdmin={isAdmin}
+                homeLoading={homeLoading}
+                currentSeries={currentSeries}
+                recentGame={recentGame}
                 topScorers={topScorers}
-                currSeriesNum={currSeriesNum}
-                activeSeries={activeSeries}
-                recentGame={allGames[0]}
-                recentStars={recentStars}
               />}
             />
-            <Route exact path="/stats" render={() => 
-              <PlayersStats 
-                isLoading={isLoading}
-                activePlayersStats={activePlayersStats}
-                activeSeries={activeSeries}
-                players={players}
+            <Route exact path="/stats" render={() =>
+              <PlayersStats
+                homeLoading={homeLoading}
+                currentSeries={currentSeries}
+                currentSeriesStats={currentSeriesStats}
+                statsLoading={playersLoading}
+                allPlayersStats={allPlayers}
               />}
             />
-            <Route exact path='/players/:playerId' render={()=> 
+            <Route exact path='/players/:playerId' render={() =>
               <PlayerInfo
-                players={players}
-                isLoading={isLoading}
+                isAdmin={isAdmin}
+                allPlayers={allPlayers}
+                playersLoading={playersLoading}
                 setSuccessfulSubmission={setSuccessfulSubmission}
               />}
             />
-            <Route exact path="/teams" render={() => 
-              <Teams 
-                isLoading={isLoading}
+            <Route exact path="/teams" render={() =>
+              <Teams
                 isAdmin={isAdmin}
+                allSeriesLoading={allSeriesLoading}
                 allSeries={allSeries}
                 seriesSuccess={seriesSuccess}
                 setSeriesSuccess={setSeriesSuccess}
               />}
             />
-            <Route exact path="/teams/:seriesId" render={() => 
-              <TeamView 
-                isLoading={isLoading}
+            <Route exact path="/teams/:seriesId" render={() =>
+              <TeamView
                 isAdmin={isAdmin}
                 allSeries={allSeries}
+                allSeriesLoading={allSeriesLoading}
               />}
             />
-            <Route exact path='/admin/createSeries' render={()=>
-              <CreateEditSeries
-                isAdmin={isAdmin}
-                setSuccessfulSubmission={setSuccessfulSubmission}
-                setSeriesSuccess={setSeriesSuccess}
-              />} 
-            />
-            <Route exact path="/teams/:seriesId/admin/editTeams" render={() => 
-              <CreateEditSeries
-                isLoading={isLoading}
-                allSeries={allSeries}
-                isAdmin={isAdmin}
-                setSuccessfulSubmission={setSuccessfulSubmission}
-                setSeriesSuccess={setSeriesSuccess}
-                edit={true}
-              />}
-            />
-            <Route exact path="/gameRecap" render={() =>
+            <Route exact path={["/gameRecap", "/gameRecap/:gameId"]} render={() =>
               <GameRecap
-                isLoading={isLoading}
                 isAdmin={isAdmin}
+                gamesLoading={gamesLoading}
                 allGames={allGames}
+                setAllGames={setAllGames}
                 gameSuccess={gameSuccess}
                 setGameSuccess={setGameSuccess}
-              />} 
+              />}
             />
-            <Route exact path="/gameRecap/:gameId" render={() =>
-              <GameRecap
-                isLoading={isLoading}
+            <Route exact path={['/admin/createSeries', "/teams/:seriesId/admin/editTeams"]} render={() =>
+              <CreateEditSeries
                 isAdmin={isAdmin}
+                playersLoading={playersLoading}
+                allPlayers={allPlayers}
+                allSeriesLoading={allSeriesLoading}
+                allSeries={allSeries}
+                setSuccessfulSubmission={setSuccessfulSubmission}
+                setSeriesSuccess={setSeriesSuccess}
+              />}
+            />
+            <Route exact path={['/admin/newGame', '/gameRecap/:gameId/admin/editGame']} render={() =>
+              <CreateEditGame
+                isAdmin={isAdmin}
+                currentSeries={currentSeries}
+                homeLoading={homeLoading}
+                playersLoading={playersLoading}
+                allPlayers={allPlayers}
+                gamesLoading={gamesLoading}
                 allGames={allGames}
-              />} 
-            />
-            <Route exact path='/admin/newGame' render={()=>
-              <CreateEditGame
-                isLoading={isLoading}
-                allSeries={allSeries}
-                isAdmin={isAdmin}
                 setSuccessfulSubmission={setSuccessfulSubmission}
                 setGameSuccess={setGameSuccess}
-              />} 
+              />}
             />
-            <Route exact path="/gameRecap/:gameId/admin/editGame" render={() =>
-              <CreateEditGame
-                isLoading={isLoading}
-                allSeries={allSeries}
-                isAdmin={isAdmin}
-                setSuccessfulSubmission={setSuccessfulSubmission}
-                setGameSuccess={setGameSuccess}
-                edit={true}
-              />} 
-            />
-            <Route exact path='/login' render={() => 
+            <Route exact path='/login' render={() =>
               <LoginPage
+                isAdmin={isAdmin}
                 setAdmin={setAdmin}
-              />} 
+              />}
             />
             <Route exact path="/admin" render={() =>
               <AdminPage
-                isLoading={isLoading}
+                allSeriesLoading={allSeriesLoading}
                 allSeries={allSeries}
+                gamesLoading={gamesLoading}
                 allGames={allGames}
                 isAdmin={isAdmin}
                 edit={true}
-              />} 
+              />}
             />
-            <Route exact path='/logout' render={()=>
-              <LogoutPage 
+            <Route exact path='/logout' render={() =>
+              <LogoutPage
                 setAdmin={setAdmin}
-              />} 
+              />}
             />
             <Route component={NoMatch} />
           </Switch>
         </Content>
         <FooterContent />
       </Layout>
-    </Router>
-      
     </>
   );
 }

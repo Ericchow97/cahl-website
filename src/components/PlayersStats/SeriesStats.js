@@ -5,9 +5,9 @@ import { Row, Col } from 'antd';
 export const SeriesStats = (props) => {
   const team1 = []
   const team2 = []
-  const team1Name = props.activeSeries.teams[0].name
-  const team2Name = props.activeSeries.teams[1].name
-  props.activePlayersStats.forEach((player, i) => {
+  const team1Name = props.currentSeries.teams[0].name
+  const team2Name = props.currentSeries.teams[1].name
+  props.currentSeriesStats.forEach((player, i) => {
     const playerStats = {
       key: i,
       id: player.id,
@@ -16,19 +16,19 @@ export const SeriesStats = (props) => {
       games: player.games,
       goals: player.goals,
       assists: player.assists,
-      points: player.points,
+      points: player.goals + player.assists,
       wins: player.wins,
-      loss: player.loss,
+      loss: player.is_goalie - player.wins,
     }
-    if (player.goalieGames > 0 ) {
-      playerStats.gaa = player.ga/player.goalieGames
+    if (player.is_goalie > 0) {
+      playerStats.gaa = Math.round((player.ga / player.is_goalie + Number.EPSILON) * 100) / 100
     } else {
       playerStats.gaa = 0
     }
-    if (player.team === team1Name) {
-      team1.push(playerStats)
-    } else if (player.team === team2Name) {
+    if (player.current_team_id % 2) {
       team2.push(playerStats)
+    } else {
+      team1.push(playerStats)
     }
   });
 
@@ -46,5 +46,5 @@ export const SeriesStats = (props) => {
       </Row>
     </>
   )
-  
+
 }

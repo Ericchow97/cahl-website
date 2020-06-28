@@ -3,8 +3,11 @@ import { Redirect } from 'react-router'
 import { Helmet } from 'react-helmet'
 import { GameInstance } from './components/CreateNewEditGame/GameInstance'
 import { CardTemplate } from './components/CardTemplate'
+import { useParams } from 'react-router-dom'
 
 export const CreateEditGame = (props) => {
+  const { gameId } = useParams()
+
   if (!props.isAdmin) {
     return (
       <Redirect push to='/' />
@@ -12,15 +15,16 @@ export const CreateEditGame = (props) => {
   } else {
     return (
       <>
-      <Helmet>
-        <title>{props.edit ? "Edit Game" : "Create New Game"}</title>
-      </Helmet>
-      {/*TODO: add game number && series to edit game*/} 
-        <CardTemplate loading={props.isLoading} header={props.edit ? "Edit Game" : "Create New Game"}>
+        <Helmet>
+          <title>{gameId ? "Edit Game" : "Create New Game"}</title>
+        </Helmet>
+        <CardTemplate loading={props.homeLoading || props.playersLoading || props.gamesLoading} header={gameId ? "Edit Game" : "Create New Game"}>
           <GameInstance
-            allSeries={props.allSeries}
+            currentSeries={props.currentSeries} // New Game
+            allPlayers={props.allPlayers} //Player select list
+            allGames={props.allGames}
+            gameId={gameId}
             setSuccessfulSubmission={props.setSuccessfulSubmission}
-            edit={props.edit}
             setGameSuccess={props.setGameSuccess}
           />
         </CardTemplate >

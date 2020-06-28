@@ -5,6 +5,8 @@ import { TeamAdminView } from '../Admin/TeamAdminView'
 export const SeriesAdminView = (props) => {
   const [team1PlayerName, setTeam1PlayerName] = useState('')
   const [team2PlayerName, setTeam2PlayerName] = useState('')
+  const [team1Disabled, setTeam1Disabled] = useState(true)
+  const [team2Disabled, setTeam2Disabled] = useState(true)
 
   //TODO: Update dropdown when name is selected, see if you can use getfields from ant FORM
 
@@ -13,24 +15,26 @@ export const SeriesAdminView = (props) => {
     // update team1name
     if (num === 1) {
       setTeam1PlayerName(event.target.value)
+      setTeam1Disabled(event.target.value ? false : true)
     }
     // update team2name
     else if (num === 2) {
       setTeam2PlayerName(event.target.value)
+      setTeam2Disabled(event.target.value ? false : true)
     }
   }
 
+  //TODO: When adding player, automatically select the player too
   // add player to the list of players
   const addNewPlayer = (num) => {
-    props.setPlayerListId(playerListId => playerListId + 1)
+    // newPlayer key indicates person was just addded to the system
     if (num === 1) {
-      // newPlayer key indicates person was just addded to the system
-      props.setAllPlayers(allPlayers => [...allPlayers, { id: props.playerListId, name: team1PlayerName, newPlayer: true }])
-      props.setPlayerList(playerList => [...playerList, team1PlayerName])
+      const sanitized_name = team1PlayerName.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.substring(1)).join(' ')
+      props.setAllPlayers(allPlayers => [...allPlayers, { name: sanitized_name, newPlayer: true }])
       setTeam1PlayerName('')
     } else {
-      props.setAllPlayers(allPlayers => [...allPlayers, { id: props.playerListId, name: team2PlayerName, newPlayer: true }])
-      props.setPlayerList(playerList => [...playerList, team2PlayerName])
+      const sanitized_name = team2PlayerName.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.substring(1)).join(' ')
+      props.setAllPlayers(allPlayers => [...allPlayers, { name: sanitized_name, newPlayer: true }])
       setTeam2PlayerName('')
     }
   }
@@ -39,42 +43,39 @@ export const SeriesAdminView = (props) => {
   const removeNewPlayer = (e, playerName) => {
     e.stopPropagation()
     props.setAllPlayers(allPlayers => allPlayers.filter(player => player.name !== playerName))
-    props.setPlayerList(playerList => playerList.filter(player => player !== playerName))
   }
 
   return (
     <>
       <Row>
         <Col xs={24} lg={12}>
-          <h1>{props.team1Name ? props.team1Name : 'Team 1'}</h1>
+          <h2>{props.team1Name || 'Team 1'}</h2>
           <TeamAdminView
             teamNum={1}
             allPlayers={props.allPlayers}
             teamList={props.teamList}
-            playerList={props.playerList}
             playerName={team1PlayerName}
+            buttonDisabled={team1Disabled}
             onNameChange={onNameChange}
             addNewPlayer={addNewPlayer}
             removeNewPlayer={removeNewPlayer}
-            handleChange={props.handleChange}
             gameStatsView={props.gameStatsView}
-            formRef={props.formRef}
+            numGoalies={props.team1Goalies}
           />
         </Col>
         <Col xs={24} lg={12}>
-          <h1>{props.team2Name ? props.team2Name : 'Team 2'}</h1>
+          <h2>{props.team2Name || 'Team 2'}</h2>
           <TeamAdminView
             teamNum={2}
             allPlayers={props.allPlayers}
             teamList={props.teamList}
-            playerList={props.playerList}
             playerName={team2PlayerName}
+            buttonDisabled={team2Disabled}
             onNameChange={onNameChange}
             addNewPlayer={addNewPlayer}
             removeNewPlayer={removeNewPlayer}
-            handleChange={props.handleChange}
             gameStatsView={props.gameStatsView}
-            formRef={props.formRef}
+            numGoalies={props.team2Goalies}
           />
         </Col>
       </Row>

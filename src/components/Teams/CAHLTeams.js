@@ -1,19 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { CardTemplate } from '../CardTemplate'
 import { SeriesCard } from '../SeriesCard'
+import InfiniteScroll from 'react-infinite-scroller';
+import { Spin } from 'antd';
+
 
 export const CAHLTeams = (props) => {
+    const [previousSeries, setPreviousSeries] = useState([])
+    const [currentTeamIndex, setCurrentTeamIndex] = useState(1)
+    const [lastTeamIndex, setLastTeamIndex] = useState(20)
+    const [isLoading, setLoading] = useState(false)
+    const [hasMore, setHasMore] = useState(true)
 
-    //TODO: Click on team series card will show the players and the amount of points they had in that series
-    let previousSeries = [] 
-    // Todo: Test if this works
-    // all series added to previous series
-    if (props.allSeries.length > 1) {
-        for (let i = 1; i < props.allSeries.length; i++) {
+    const addNewSeries = () => {
+        for (let i = currentTeamIndex; i < lastTeamIndex; i++) {
             const team1 = props.allSeries[i].teams[0]
             const team2 = props.allSeries[i].teams[1]
 
-            previousSeries.push(<SeriesCard 
+            setPreviousSeries(previousSeries => [...previousSeries, (<SeriesCard
                 key={i}
                 title={`Series #${props.allSeries[i].id}`}
                 team1Name={team1.name}
@@ -25,31 +29,51 @@ export const CAHLTeams = (props) => {
                 captain2={team2.captain}
                 divider={true}
                 seriesId={props.allSeries[i].id}
-            />)
+            />)])
         }
-        
+    }
+
+    const loadMore = () => {
+        setLoading(true)
+        if (currentTeamIndex === props.allSeries.length) {
+            setHasMore(false)
+            setLoading(false)
+            return
+        }
+        addNewSeries()
+        setCurrentTeamIndex(lastTeamIndex)
+        setLastTeamIndex(Math.min(props.allSeries.length, lastTeamIndex + 20))
+        setLoading(false)
     }
 
     return (
         <>
-            <CardTemplate loading={props.isLoading} header='Current Series'>
-                    <SeriesCard 
-                        title={`Series #${props.allSeries[0].id}`}
-                        team1Name={props.allSeries[0].teams[0].name}
-                        team2Name={props.allSeries[0].teams[1].name}
-                        team1Score={props.allSeries[0].teams[0].series_score}
-                        team2Score={props.allSeries[0].teams[1].series_score}
-                        captain="true"
-                        captain1={props.allSeries[0].teams[0].captain}
-                        captain2={props.allSeries[0].teams[1].captain}
-                        seriesId={props.allSeries[0].id}
-                    />
-                </CardTemplate>
-                {previousSeries.length > 0 &&
-                <CardTemplate loading={props.isLoading} header='Previous Series'>
+            <CardTemplate header='Current Series'>
+                <SeriesCard
+                    title={`Series #${props.allSeries[0].id}`}
+                    team1Name={props.allSeries[0].teams[0].name}
+                    team2Name={props.allSeries[0].teams[1].name}
+                    team1Score={props.allSeries[0].teams[0].series_score}
+                    team2Score={props.allSeries[0].teams[1].series_score}
+                    captain="true"
+                    captain1={props.allSeries[0].teams[0].captain}
+                    captain2={props.allSeries[0].teams[1].captain}
+                    seriesId={props.allSeries[0].id}
+                />
+            </CardTemplate>
+            <CardTemplate header='Previous Series'>
+                <InfiniteScroll
+                    loadMore={loadMore}
+                    hasMore={!isLoading && hasMore}
+                >
                     {previousSeries}
-                </CardTemplate>
-                }
-        </>   
-    )    
+                    {isLoading &&
+                        <div style={{ textAlign: 'center' }}>
+                            <Spin />
+                        </div>
+                    }
+                </InfiniteScroll>
+            </CardTemplate>
+        </>
+    )
 }

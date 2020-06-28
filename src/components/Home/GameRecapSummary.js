@@ -7,20 +7,20 @@ const { Meta } = Card;
 export const GameRecapSummary = (props) => {
     return (
         <>
-            {props.recentStars.length === 3 ? (
+            {props.recentGame && props.recentGame.game_summary ? (
                 <>
-                    <Meta 
+                    <Meta
                         title={props.recentGame.game_summary.title}
-                        description={props.recentGame.game_summary.summary}
-                        style={{color:"white"}}
+                        description={<pre>{props.recentGame.game_summary.summary}</pre>}
+                        style={{ color: "white" }}
                     />
-                    <ThreeStars stars={props.recentStars} />
+                    <ThreeStars stars={props.recentGame.game_summary} />
                 </>
             ) : (
-                <h1>Game Summary has not been created yet</h1>
-            )
+                    <h1>Game Summary has not been created yet</h1>
+                )
             }
-            <div style={{textAlign: 'right'}}>
+            <div style={{ textAlign: 'right' }}>
                 <Button type="primary" name='gameSummary' onClick={(record) => props.handleClick(record)}>Read More</Button>
             </div>
         </>

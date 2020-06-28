@@ -15,16 +15,16 @@ export const CreateEditSeries = (props) => {
   } else {
     return (
       <>
-      <Helmet>
-        <title>{props.edit ? `Edit Series #${seriesId}` : "Create New Series"}</title>
-      </Helmet>
-        <CardTemplate loading={props.isLoading} header={props.edit ? `Edit Series #${seriesId}` : "Create New Series"}>
+        <Helmet>
+          <title>{seriesId ? `Edit Series #${seriesId}` : "Create New Series"}</title>
+        </Helmet>
+        <CardTemplate loading={props.playersLoading || props.allSeriesLoading} header={seriesId ? `Edit Series #${seriesId}` : "Create New Series"}>
           <SeriesInstance
-            setSuccessfulSubmission={props.setSuccessfulSubmission}
-            setSeriesSuccess={props.setSeriesSuccess}
+            allPlayers={props.allPlayers}
             allSeries={props.allSeries}
             seriesId={seriesId}
-            edit={props.edit}
+            setSuccessfulSubmission={props.setSuccessfulSubmission}
+            setSeriesSuccess={props.setSeriesSuccess}
           />
         </CardTemplate >
       </>
