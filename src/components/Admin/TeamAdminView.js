@@ -107,6 +107,7 @@ export const TeamAdminView = (props) => {
                         <Select
                           showSearch
                           onInputKeyDown={e => handleSelect(e)}
+                          onSelect={name => props.onSelect(name)}
                           style={{ color: 'black', padding: '0' }}
                           placeholder="Player Name"
                           dropdownRender={menu => (
@@ -115,14 +116,14 @@ export const TeamAdminView = (props) => {
                               <Divider style={{ margin: '4px 0' }} />
                               <div style={{ display: 'flex', flexWrap: 'nowrap', padding: 8 }} >
                                 <Input style={{ flex: 'auto', marginRight: '10px' }} value={props.playerName} onChange={e => props.onNameChange(e, props.teamNum)} autoComplete='off' />
-                                <Button type="primary" disabled={props.buttonDisabled} onClick={() => props.addNewPlayer(props.teamNum)} style={{ flex: 'none', padding: '0px 8px', display: 'block' }}>
-                                  <PlusOutlined style={{ verticalAlign: "0.125em" }} /> Add Player
+                                <Button type="primary" disabled={props.buttonDisabled} onClick={() => props.addNewPlayer(props.teamNum, field.name)} style={{ flex: 'none', padding: '0px 8px', display: 'block' }}>
+                                  <PlusOutlined /> Add Player
                                 </Button>
                               </div>
                             </div>
                           )}
                         >
-                          {props.allPlayers.map((player, i) => (
+                          {props.playerDropdownList.map((player, i) => (
                             <Option key={i} style={{ color: 'black' }} value={player.name}>{player.name}
                               {player.newPlayer && <MinusCircleOutlined
                                 style={{ position: 'absolute', right: '5%', bottom: '25%' }}
@@ -195,6 +196,7 @@ export const TeamAdminView = (props) => {
                       <MinusCircleOutlined
                         onClick={() => {
                           remove(field.name)
+                          props.removeExistingPlayer()
                         }}
                       />
                     </Col>
@@ -208,7 +210,7 @@ export const TeamAdminView = (props) => {
                     add({ name: undefined, goals: 0, assists: 0, isGoalie: 0 });
                   }}
                 >
-                  <PlusOutlined style={{ verticalAlign: "0.125em" }} /> Add Player
+                  <PlusOutlined /> Add Player
                 </Button>
               </Form.Item>
             </div>

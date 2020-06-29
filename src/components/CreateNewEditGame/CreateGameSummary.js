@@ -5,7 +5,6 @@ const { Option } = Select
 const { TextArea } = Input
 export const CreateGameSummary = (props) => {
 
-  //TODO: MAKE game summary three stars list only list to selected players
   const formItemLayout = {
     labelCol: {
       xs: { span: 24 },
@@ -33,7 +32,6 @@ export const CreateGameSummary = (props) => {
   }
 
   const starList = ['First Star', 'Second Star', 'Third Star']
-  //TODO: Update dropdown when name is selected, see if you can use getfields from ant FORM
   return (
     <>
       <h2>Game Summary</h2>
@@ -109,8 +107,8 @@ export const CreateGameSummary = (props) => {
                       style={{ color: 'black', padding: '0' }}
                       placeholder="Player Name"
                     >
-                      {props.allPlayers.map((player, i) => (
-                        <Option key={i} style={{ color: 'black' }} value={player.name}>{player.name}</Option>
+                      {props.starsDropdownList.map((player, i) => (
+                        <Option key={i} style={{ color: 'black' }} value={player.player_name}>{player.player_name}</Option>
                       ))}
                     </Select>
                   </Form.Item>

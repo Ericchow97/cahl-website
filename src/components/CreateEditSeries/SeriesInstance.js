@@ -21,6 +21,8 @@ export const SeriesInstance = (props) => {
   const [team2, setTeam2] = useState({})
   const [invalidSeries, setInvalidSeries] = useState(false)
 
+  const [form] = Form.useForm()
+
   useEffect(() => {
     // set list of previous team names
     for (let i = 0; i < props.allSeries.length; i++) {
@@ -115,8 +117,10 @@ export const SeriesInstance = (props) => {
             onFinish={onFinish}
             onFinishFailed={onFinishFailed}
             initialValues={initialValues}
+            form={form}
           >
             <SeriesAdminView
+              form={form}
               allPlayers={allPlayers}
               setAllPlayers={setAllPlayers}
               teamList={teamList}

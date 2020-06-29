@@ -30,7 +30,7 @@ export const GameSummary = (props) => {
           <h3>{props.gameInfo.game_summary.title}</h3>
           <Divider />
           <div>
-            <CalendarOutlined style={{ verticalAlign: "0.125em", paddingRight: '8px' }} />
+            <CalendarOutlined style={{ paddingRight: '8px' }} />
             <span className="div-pad date-font">{props.gameInfo.game_summary.game_date}</span>
           </div>
         </>
