@@ -31,7 +31,6 @@ const App = () => {
   const [seriesSuccess, setSeriesSuccess] = useState()
   const [gameSuccess, setGameSuccess] = useState()
 
-  // TODO: change all alerts to messages
   // TODO: change fetch url when have server, and image urls
 
   // Home Page Variables

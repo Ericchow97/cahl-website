@@ -47,6 +47,9 @@ export const GameInstance = (props) => {
   // Access variables
   const team1Name = prevGameStats.game_result ? prevGameStats.game_result[0].team_name : props.currentSeries.teams[0].name
   const team2Name = prevGameStats.game_result ? prevGameStats.game_result[1].team_name : props.currentSeries.teams[1].name
+  const [form] = Form.useForm()
+  const [starsDropdownList, setStarsDropdownList] = useState([])
+
 
   // obtain list of all player names from server & store in state
   useEffect(() => {
@@ -66,6 +69,7 @@ export const GameInstance = (props) => {
         }
       }
       setPrevGameStats(currentGame)
+      setStarsDropdownList([...currentGame.game_result[0].players, ...currentGame.game_result[1].players])
       setShowShootout(currentGame.game_result[0].team_score === currentGame.game_result[1].team_score)
       setTeam1Score(currentGame.game_result[0].team_score)
       setTeam2Score(currentGame.game_result[1].team_score)
@@ -213,6 +217,7 @@ export const GameInstance = (props) => {
 
   if (!isLoading) {
     if (!invalidGame) {
+      const initialValues = getInitialValues()
       return (
         <>
           {redirect && <Redirect push to={`/gameRecap`} />}
@@ -230,10 +235,13 @@ export const GameInstance = (props) => {
             {...formItemLayoutWithOutLabel}
             onFinish={onFinish}
             onFinishFailed={onFinishFailed}
-            initialValues={getInitialValues()}
+            initialValues={initialValues}
             onValuesChange={(changedValue, allValues) => handleChange(changedValue, allValues)}
+            form={form}
           >
             <SeriesAdminView
+              form={form}
+              setStarsDropdownList={setStarsDropdownList}
               gameStatsView={true}
               allPlayers={allPlayers}
               setAllPlayers={setAllPlayers}
@@ -251,7 +259,7 @@ export const GameInstance = (props) => {
               />
             }
             <CreateGameSummary
-              allPlayers={allPlayers}
+              starsDropdownList={starsDropdownList}
               hideGameSummary={hideGameSummary}
             />
             <Form.Item style={{ textAlign: 'right' }}>
