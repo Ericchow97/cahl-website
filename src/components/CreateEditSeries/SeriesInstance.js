@@ -1,20 +1,22 @@
-import React, { useState, useEffect } from 'react'
-import { Form, Alert, Button } from 'antd';
+import React, { useState, useEffect, useContext } from 'react'
+import { Form, Alert, Button, message } from 'antd';
 import { SeriesAdminView } from '../Admin/SeriesAdminView'
 import { Redirect } from 'react-router';
+import { AdminContext } from '../../AdminContextProvider'
 
 //functions
 import { createNewSeries } from './createNewSeries'
 import { editSeries } from './editSeries'
 
 export const SeriesInstance = (props) => {
+  const adminContext = useContext(AdminContext)
+
   const [redirect, setRedirect] = useState(false)
   const [isLoading, setLoading] = useState(true)
 
   const [allPlayers, setAllPlayers] = useState(props.allPlayers) // player name dropdown
   const [teamList, setTeamList] = useState([]) // ensure non-duplicate names
   const [unsuccessfulSubmission, setUnsuccessfulSubmission] = useState(false)
-  const [serverErrorMessage, setServerErrorMessage] = useState(false)
 
   //EDIT state: previous teams 
   const [team1, setTeam1] = useState({})
@@ -52,24 +54,24 @@ export const SeriesInstance = (props) => {
   }, [props.allPlayers, props.allSeries, props.seriesId])
 
   const onFinish = async values => {
-    let success = false
+    let ret
     if (props.seriesId) {
-      success = await editSeries(values, allPlayers, team1, team2, props.seriesId)
-      if (success) {
-        props.setSeriesSuccess('Successfully edited series')
+      ret = await editSeries(values, allPlayers, team1, team2, props.seriesId, adminContext)
+      if (ret.success) {
+        message.success('Successfully edited series')
       }
     } else {
-      success = await createNewSeries(values, allPlayers)
-      if (success) {
-        props.setSeriesSuccess('Successfully created a new series')
+      ret = await createNewSeries(values, allPlayers, adminContext)
+      if (ret.success) {
+        message.success('Successfully created a new series')
       }
     }
 
-    if (success) {
+    if (ret.success) {
       setRedirect(true)
-      props.setSuccessfulSubmission(true)
+      props.setSuccessfulSubmission(count => count + 1)
     } else {
-      setServerErrorMessage(true)
+      message.error(ret.message)
     }
   };
 
@@ -103,8 +105,8 @@ export const SeriesInstance = (props) => {
         }
       } else {
         initialValues = {
-          'Team1Players': new Array(13).fill(undefined),
-          'Team2Players': new Array(13).fill(undefined)
+          'Team1Players': new Array(13).fill().map(Object),
+          'Team2Players': new Array(13).fill().map(Object)
         }
       }
 
@@ -140,14 +142,6 @@ export const SeriesInstance = (props) => {
               closable
               showIcon
               afterClose={() => handleClose('fail')}
-            />
-          }
-          {serverErrorMessage &&
-            <Alert
-              message="Server Error"
-              type="error"
-              closable
-              showIcon
             />
           }
         </>

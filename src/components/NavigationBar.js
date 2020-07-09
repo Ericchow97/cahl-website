@@ -4,8 +4,9 @@ import { Menu, Row, Col } from 'antd';
 import logo from '../assets/CAHLLogo.png'
 import logoText from '../assets/CAHLLogoText.png'
 import { MenuOutlined } from '@ant-design/icons'
+import { IsAdmin } from '../AdminContextProvider'
 
-export const NavigationBar = (props) => {
+export const NavigationBar = () => {
   return (
     <>
       <Row className="gradient">
@@ -47,7 +48,7 @@ export const NavigationBar = (props) => {
             <Menu.Item key="/gameRecap">
               <Link to="/gameRecap">Recap</Link>
             </Menu.Item>
-            {props.isAdmin &&
+            {IsAdmin() &&
               <Menu.Item key="/logout">
                 <Link to="/admin">Admin</Link>
               </Menu.Item>

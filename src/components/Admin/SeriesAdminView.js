@@ -10,19 +10,21 @@ export const SeriesAdminView = (props) => {
   const [team1Disabled, setTeam1Disabled] = useState(true)
   const [team2Disabled, setTeam2Disabled] = useState(true)
 
+
   useEffect(() => {
     // on load, filter the drop down list based on the initial team players
     const newPlayers = props.form.getFieldsValue()
     let allPlayersCopy = [...props.allPlayers]
-    for (let i = 0; i < newPlayers.Team1Players.length; i++) {
-      allPlayersCopy = allPlayersCopy.filter(player => player.name !== newPlayers.Team1Players[i].name)
-    }
-    for (let i = 0; i < newPlayers.Team2Players.length; i++) {
-      allPlayersCopy = allPlayersCopy.filter(player => player.name !== newPlayers.Team2Players[i].name)
+    const teamPlayersArray = ['Team1Players', 'Team2Players']
+    for (let i = 0; i < teamPlayersArray.length; i++) {
+      for (let j = 0; j < newPlayers[teamPlayersArray[i]].length; j++) {
+        if (newPlayers[teamPlayersArray[i]][j]) {
+          allPlayersCopy = allPlayersCopy.filter(player => player.name !== newPlayers[teamPlayersArray[i]][j].name)
+        }
+      }
     }
     setPreviousPlayers(newPlayers)
     setPlayerDropdownList(allPlayersCopy)
-    console.log('ran')
   }, [props.allPlayers, props.form])
 
   const updateStarsDropdown = (oldName, name) => {
@@ -49,21 +51,21 @@ export const SeriesAdminView = (props) => {
   // add player to the list of players
   const addNewPlayer = (num, playerInstance) => {
     // newPlayer key indicates person was just addded to the system
+    let sanitized_name, newPlayers
     if (num === 1) {
-      const sanitized_name = team1PlayerName.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.substring(1)).join(' ')
-      const newPlayers = props.form.getFieldValue('Team1Players')
-      updateStarsDropdown(newPlayers[playerInstance].name, sanitized_name)
-      newPlayers[playerInstance].name = sanitized_name
-      props.setAllPlayers(allPlayers => [...allPlayers, { name: sanitized_name, newPlayer: true }])
+      sanitized_name = team1PlayerName.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.substring(1)).join(' ')
+      newPlayers = props.form.getFieldValue('Team1Players')
       setTeam1PlayerName('')
     } else {
-      const sanitized_name = team2PlayerName.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.substring(1)).join(' ')
-      const newPlayers = props.form.getFieldValue('Team2Players')
-      updateStarsDropdown(newPlayers[playerInstance].name, sanitized_name)
-      newPlayers[playerInstance].name = sanitized_name
-      props.setAllPlayers(allPlayers => [...allPlayers, { name: sanitized_name, newPlayer: true }])
+      sanitized_name = team2PlayerName.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.substring(1)).join(' ')
+      newPlayers = props.form.getFieldValue('Team2Players')
       setTeam2PlayerName('')
     }
+    if (props.gameStatsView) {
+      updateStarsDropdown(newPlayers[playerInstance].name, sanitized_name)
+    }
+    newPlayers[playerInstance].name = sanitized_name
+    props.setAllPlayers(allPlayers => [...allPlayers, { name: sanitized_name, newPlayer: true }])
   }
 
   // remove only newPlayers from the list
@@ -73,50 +75,46 @@ export const SeriesAdminView = (props) => {
     setPlayerDropdownList(players => players.filter(player => player.name !== playerName))
   }
 
-  const onSelect = (name) => {
-    const newPlayers = props.form.getFieldsValue()
-    for (let i = 0; i < previousPlayers.Team1Players.length; i++) {
-      if (previousPlayers.Team1Players[i] !== newPlayers.Team1Players[i]) {
-        setPlayerDropdownList(players => players.filter(player => player.name !== name))
-        const oldPlayerIndex = props.allPlayers.findIndex(player => player.name === previousPlayers.Team1Players[i].name)
-        setPlayerDropdownList(players => [...players, { name: previousPlayers.Team1Players[i].name, newPlayer: props.allPlayers[oldPlayerIndex].newPlayer }])
-        updateStarsDropdown(previousPlayers.Team1Players[i].name, name)
-        setPreviousPlayers(newPlayers)
-        return
+  // add back previous player
+  const addPreviousPlayer = (newPlayers, index, name, type = 'remove') => {
+    const teamPlayersArray = ['Team1Players', 'Team2Players']
+    for (let i = 0; i < teamPlayersArray.length; i++) {
+      // only check if element exist in previous player array
+      if (previousPlayers[teamPlayersArray[i]][index]) {
+        // if there was a previous player, add player back into player dropdown list
+        if (previousPlayers[teamPlayersArray[i]][index].name && (!newPlayers[teamPlayersArray[i]][index]
+          || previousPlayers[teamPlayersArray[i]][index].name !== newPlayers[teamPlayersArray[i]][index].name)) {
+          const oldPlayerIndex = props.allPlayers.findIndex(player => player.name === previousPlayers[teamPlayersArray[i]][index].name)
+          setPlayerDropdownList(players => [...players, { name: previousPlayers[teamPlayersArray[i]][index].name, newPlayer: props.allPlayers[oldPlayerIndex].newPlayer }])
+          if (props.gameStatsView && type === 'select') {
+            updateStarsDropdown(previousPlayers[teamPlayersArray[i]][index].name, name)
+          } else if (props.gameStatsView && type === 'remove') {
+            props.setStarsDropdownList(players => players.filter(player => player.player_name !== previousPlayers[teamPlayersArray[i]][index].name))
+          }
+          return
+        }
+      } else {
+        break
       }
     }
-    for (let i = 0; i < previousPlayers.Team2Players.length; i++) {
-      if (previousPlayers.Team2Players[i] !== newPlayers.Team2Players[i]) {
-        setPlayerDropdownList(players => players.filter(player => player.name !== name))
-        const oldPlayerIndex = props.allPlayers.findIndex(player => player.name === previousPlayers.Team2Players[i].name)
-        setPlayerDropdownList(players => [...players, { name: previousPlayers.Team2Players[i].name, newPlayer: props.allPlayers[oldPlayerIndex].newPlayer }])
-        updateStarsDropdown(previousPlayers.Team2Players[i].name, name)
-        setPreviousPlayers(newPlayers)
-        return
-      }
+    // if there wasn't a previous player
+    if (props.gameStatsView && type === 'select') {
+      props.setStarsDropdownList(players => [...players, { player_name: name }])
     }
   }
-  
-  const removeExistingPlayer = () => {
+
+  const onSelect = (name, index) => {
     const newPlayers = props.form.getFieldsValue()
-    for (let i = 0; i < previousPlayers.Team1Players.length; i++) {
-      if (previousPlayers.Team1Players[i] !== newPlayers.Team1Players[i]) {
-        const oldPlayerIndex = props.allPlayers.findIndex(player => player.name === previousPlayers.Team1Players[i].name)
-        setPlayerDropdownList(players => [...players, { name: previousPlayers.Team1Players[i].name, newPlayer: props.allPlayers[oldPlayerIndex].newPlayer }])
-        props.setStarsDropdownList(players => players.filter(player => player.player_name !== previousPlayers.Team1Players[i].name))
-        setPreviousPlayers(newPlayers)
-        return
-      }
-    }
-    for (let i = 0; i < previousPlayers.Team2Players.length; i++) {
-      if (previousPlayers.Team2Players[i] !== newPlayers.Team2Players[i]) {
-        const oldPlayerIndex = props.allPlayers.findIndex(player => player.name === previousPlayers.Team2Players[i].name)
-        setPlayerDropdownList(players => [...players, { name: previousPlayers.Team2Players[i].name, newPlayer: props.allPlayers[oldPlayerIndex].newPlayer }])
-        props.setStarsDropdownList(players => players.filter(player => player.player_name !== previousPlayers.Team2Players[i].name))
-        setPreviousPlayers(newPlayers)
-        return
-      }
-    }
+    // remove new player from dropdown selection
+    setPlayerDropdownList(players => players.filter(player => player.name !== name))
+    addPreviousPlayer(newPlayers, index, name, 'select')
+    setPreviousPlayers(newPlayers)
+  }
+
+  const removeExistingPlayer = (index) => {
+    const newPlayers = props.form.getFieldsValue()
+    addPreviousPlayer(newPlayers, index)
+    setPreviousPlayers(newPlayers)
   }
 
   return (

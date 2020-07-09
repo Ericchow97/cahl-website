@@ -90,9 +90,9 @@ export const PlayerProfile = (props) => {
       careerStats.gaa = 0
     }
     careerStats.points = careerStats.goals + careerStats.assists
-    console.log(careerStats)
     setPlayerTotalStats([careerStats])
   }, [playerStats])
+
   return (
     <>
       <Helmet>

@@ -6,6 +6,7 @@ import { ScoringLeaders } from './components/Home/ScoringLeaders';
 import { SeriesHome } from "./components/Home/SeriesHome";
 import { GameRecapSummary } from "./components/Home/GameRecapSummary";
 import { CardTemplate } from './components/CardTemplate'
+import { IsAdmin } from './AdminContextProvider'
 
 export const Home = (props) => {
   // require call to API for scoring leaders and recap of game
@@ -42,7 +43,7 @@ export const Home = (props) => {
             loading={props.homeLoading}
             header="Current Series"
             style={{ textAlign: "center" }}
-            extra={props.isAdmin}
+            extra={IsAdmin()}
             buttonText='New Game'
             handleClick={handleAdminClick}
           >
