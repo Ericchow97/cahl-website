@@ -1,35 +1,55 @@
-import React from 'react'
-import { CardTemplate } from '../CardTemplate'
-import { List } from 'antd';
+import React, { useState } from 'react'
+import InfiniteScroll from 'react-infinite-scroller';
+import { List, Spin } from 'antd';
 
-export const PrevSummary = () => {
-    const data = [
-        {
-          title: 'Game Recap 1',
-        },
-        {
-          title: 'Game Recap 2',
-        },
-        {
-          title: 'Game Recap 3',
-        },
-        {
-          title: 'Game Recap 4',
-        },
-    ];
-    return (
-        <CardTemplate header="Previous Recaps" headSize="20px">
-            <List
-                itemLayout="horizontal"
-                dataSource={data}
-                renderItem={item => (
-                <List.Item>
-                    <List.Item.Meta
-                    title={item.title}
-                    />
-                </List.Item>
-                )}
+export const PrevSummary = (props) => {
+  const [gameIds, setGameIds] = useState([props.allGames.length, Math.min(props.allGames.length + 20, props.allGames[0].id)])
+  const [isLoading, setLoading] = useState(false)
+  const [hasMore, setHasMore] = useState(true)
+
+  const data = props.allGames.map((gameData, i) => {
+    return {
+      id: gameData.id,
+      title: `${gameData.game_result[0].team_name} vs ${gameData.game_result[1].team_name} - Game ${gameData.num}`
+    }
+  })
+
+  const loadMore = async () => {
+    setLoading(true)
+    if (gameIds[0] + 1 > props.allGames[0].id) {
+      setHasMore(false)
+      setLoading(false)
+      return
+    }
+    const newGames = await (await (fetch(`http://127.0.0.1:8000/game/?game_ids=${gameIds[0]},${gameIds[1]}`))).json()
+    props.setAllGames(allGames => [...allGames, ...newGames])
+    setGameIds([gameIds[1], Math.min(gameIds[1] + (gameIds[1] - gameIds[0]), props.allGames[0].id)])
+    setLoading(false)
+  }
+
+  return (
+    <InfiniteScroll
+      initialLoad={false}
+      loadMore={loadMore}
+      hasMore={!isLoading && hasMore}
+      useWindow={false}
+    >
+      <List
+        itemLayout="horizontal"
+        dataSource={data}
+        renderItem={item => (
+          <List.Item onClick={() => props.handleClick(item.id)}>
+            <List.Item.Meta
+              title={item.title}
             />
-        </CardTemplate>
-    )
+          </List.Item>
+        )}
+      />
+      {isLoading &&
+        <div style={{ textAlign: 'center' }}>
+          <Spin />
+        </div>
+      }
+    </InfiniteScroll>
+  )
 }

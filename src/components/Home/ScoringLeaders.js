@@ -1,92 +1,60 @@
-import React, {useState} from 'react';
-import { Table } from 'antd';
-import { CardTemplate } from '../CardTemplate'
+import React, { useState } from 'react';
+import { Table, Row, Col } from 'antd';
+import { Mobile } from '../../ResponsiveContextProvider'
 
 const { Column } = Table;
 
 export const ScoringLeaders = (props) => {
-    const data = [
-        {
-          key: '1',
-          id: '1',
-          name: 'name',
-          goals: 20,
-          assists: 99,
-          points: 119,
-          image:"ericchow.gif"
-        },
-        {
-          key: '2',
-          id: '2',
-          name: 'name 2',
-          goals: 20,
-          assists: 10,
-          points: 30,
-          image: "Alex.jpg"
-        },
-        {
-          key: '3',
-          id: '3',
-          name: 'name 3',
-          goals: 10,
-          assists: 20,
-          points: 30,
-          image: "chrischow.jpg"
-        },
-        {
-          key: '4',
-          id: '4',
-          name: 'name 4',
-          goals: 5,
-          assists: 20,
-          points: 25,
-          image: "Clarence.gif"
-        },
-        {
-          key: '5',
-          id: '5',
-          name: 'name 5',
-          goals: 0,
-          assists: 1,
-          points: 1,
-          image: "Ken.gif"
-        }
-    ]
+    const [playerImage, setImage] = useState(`http://127.0.0.1:8000/media/${props.topScorers[0].image}`)
 
-    const images = data.map(person => {
-        return require('../../assets/' + person.image)
+    const data = props.topScorers.map((player, i) => {
+        return {
+            key: i,
+            id: player.id,
+            num: player.num,
+            name: player.name,
+            goals: player.goals,
+            assists: player.assists,
+            points: player.goals + player.assists,
+            image: player.image
+        }
     })
 
-    const [playerImage, setImage] = useState(images[0])
-    const handleMouseOver = (record, rowIndex) => {
-        setImage(images[rowIndex])
-        console.log("test")
+    const handleMouseOver = (record) => {
+        setImage(`http://127.0.0.1:8000/media/${record.image}`)
     }
 
     return (
-        <CardTemplate header="Scoring Leaders">
-            <div className="float" style={{width:"60%"}}>
-                <Table 
-                    dataSource={data}
-                    pagination={false}
-                    onRow={(record, rowIndex) => {
-                        return {
-                            onMouseEnter: () => handleMouseOver(record, rowIndex),
-                            onClick: () => props.handleClick(record)
-                        }
-                    }}
-                >
-                    <Column title="#" dataIndex="id" key="id" />
-                    <Column title="Name" dataIndex="name" key="name" />
-                    <Column title="G" dataIndex="goals" key="goals" />
-                    <Column title="A" dataIndex="assists" key="assists" />
-                    <Column title="Pts" dataIndex="points" key="points" />
-                </Table>
-            </div>
-            <div className ="center-float float" style={{width:"30%"}}>
-                <img src={playerImage} alt="player" width="100%"/>
-            </div>            
-        </CardTemplate>
+        <>
+            <Row gutter={12}>
+                <Col span={Mobile() ? 24 : 12}>
+                    <Table
+                        dataSource={data}
+                        pagination={false}
+                        onRow={(record) => {
+                            return {
+                                onMouseEnter: () => handleMouseOver(record),
+                                onTouchStart: () => handleMouseOver(record),
+                                onClick: () => props.handleClick(record)
+                            }
+                        }}
+                    >
+                        <Column width='15%' title="#" dataIndex="num" key="num" />
+                        <Column width='50%' title="Name" dataIndex="name" key="name" ellipsis={true} />
+                        <Column width='10%' title="G" dataIndex="goals" key="goals" />
+                        <Column width='10%' title="A" dataIndex="assists" key="assists" />
+                        <Column width='15%' title="Pts" dataIndex="points" key="points" />
+                    </Table>
+                </Col>
+                {!Mobile() &&
+                    <Col span={12} style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
+                        <span style={{ display: 'inline-block', verticalAlign: 'middle', height: '100%' }}></span>
+                        <img src={playerImage} alt="player" style={{ verticalAlign: 'middle', maxHeight: '330px', width: '100%', maxWidth: '250px' }} />
+                    </Col>
+                }
+            </Row>
+        </>
+
     )
 }
 

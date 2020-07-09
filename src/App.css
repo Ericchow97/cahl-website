@@ -1,33 +1,6 @@
-.row {
-  text-align: center;
-  margin-right: 0;
-  margin-left: 0;
-}
-
-.centered {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  margin-right: -50%;
-  transform: translate(-50%, -50%);
-  width: 100%;
-}
-
-.card {
-  margin-top: 32px;
-  margin-bottom: 32px;
-}
-
 .gradient {
   background-image: linear-gradient(to right, rgb(30,30,30) , red);
   padding: 0 32px;
-}
-
-.card-header {
-  font-size: 32px;
-  font-weight: bold;
-  font-style: italic;
-  text-transform: uppercase;
 }
 
 thead {
@@ -43,51 +16,13 @@ thead {
   border-left: 1px solid rgb(138, 15, 15);
 }
 
-.carousel {
+.ant-carousel {
   width: 100%;
 }
+
 .carousel-row{
   border:2px solid rgb(138, 15, 15);
   font-size: 0.9rem;
-}
-
-@media only screen and (max-width: 510px) {
-  .center-float {
-      display: none;
-  }
-}
-
-.center-float {
-  position: absolute;
-  height: 100%;
-  right: 5%;
-  top: 30%;
-}
-
-.float{
-  float: left;
-  width: 49%;
-}
-
-.float>.row {
-  border: 2px solid rgb(138, 15, 15);
-  padding: 0;
-}
-
-.float>.row> * {
-  padding: 0;
-}
-
-.carousel-control-prev {
-  left:-5%;
-}
-
-.carousel-control-next {
-  right:-5%;
-}
-
-.carousel-indicators {
-  bottom: -50%;
 }
 
 .footer {
@@ -95,22 +30,16 @@ thead {
   padding: 10px;
   text-align: center;
   vertical-align: middle;
-  line-height: 100px;
+  line-height: 50px;
 }
 
 .col-sm-12 {
   padding:0;
 }
 
-
 .card-border {
   border: 2px solid rgb(138, 15, 15);
   margin-bottom: 24px;
-}
-
-.seriesGame {
-  width: 101%;
-  overflow: hidden;
 }
 
 .carousel-arrow {
@@ -132,7 +61,7 @@ tr>td {
 
 @media screen and (min-width: 769px) {
   .navbar {
-    float: right;
+    text-align: right;
   }
   .ant-menu-item {
     font-size: 16px;
@@ -147,26 +76,20 @@ tr>td {
 
 .circle-img{
   border-radius: 50%;
-  height: 200px;
-  width: 200px;
+  height: 25vw;
+  width: 25vw;
   display: block;
   margin-left: auto;
   margin-right: auto;
-  margin-top:-100px;
+  margin-top:-12.5vw;
+  max-height: 300px;
+  max-width: 300px;
 }
 
-.divider {
+.player-info {
   text-align: center;
-  font-size: 20px;
-  padding: 0 0 12px;
-}
-
-.div-pad {
-  padding: 0 4px;
-}
-
-.main-divider {
   font-size: 32px;
+  padding: 0 0 12px;
 }
 
 .ant-table-row-expand-icon {
@@ -185,6 +108,68 @@ tr>td {
   padding-bottom: 24px;
 }
 
-.ant-btn {
-  float: right;
+.ant-carousel .slick-dots-bottom {
+  bottom: -20px !important;
+  padding: 0px;
+}
+
+.ant-col {
+  width: 100%;
+}
+
+.ant-alert-message {
+  color: #000 !important
+}
+
+.ant-input-number-handler-wrap .ant-input-number-handler .ant-input-number-handler-up-inner, .ant-input-number-handler-wrap .ant-input-number-handler .ant-input-number-handler-down-inner {
+  color: black
+}
+
+.ant-form-item-explain {
+  margin-top: -4px !important;
+}
+
+.ant-table-tbody > tr :hover {
+  cursor: pointer;
+}
+
+.ant-list-item :hover {
+  cursor: pointer;
+  background-color: red;
+  color: black;
+}
+
+.ant-message-notice-content {
+  color:black
+}
+
+h2 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.game_carousel_heading {
+  background-color: rgb(138, 15, 15);
+  justify-content: center;
+  align-content: center;
+}
+
+.game_carousel_team_name {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  margin: 10px 0 15px 5px;
+}
+
+pre {
+  white-space: pre-wrap;       /* Since CSS 2.1 */
+  white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+  white-space: -pre-wrap;      /* Opera 4-6 */
+  white-space: -o-pre-wrap;    /* Opera 7 */
+  word-wrap: break-word;       /* Internet Explorer 5.5+ */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji', monospace;
+}
+
+.ant-select-item-option-content {
+  color: black;
 }

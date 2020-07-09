@@ -1,99 +1,50 @@
 import React from 'react'
-import { CardTemplate } from '../CardTemplate'
 import { StatsTable } from './StatsTable'
 import { Row, Col } from 'antd';
 
 export const SeriesStats = (props) => {
-  const team1 = [
-    {
-      key: "1",
-      id: "99",
-      player: "Eric Chow",
-      games: "7",
-      goals: "100",
-      assists: "10",
-      points: "1000",
-      wins: "10",
-      loss: "0",
-      gaa: "2"
-    },
-    {
-      key: "2",
-      id: "92",
-      player: "arwef Chow",
-      games: "7",
-      goals: "100",
-      assists: "10",
-      points: "100",
-      wins: "10",
-      loss: "0",
-      gaa: "2"
-    },
-    {
-      key: "3",
-      id: "99",
-      player: "Ericewefwef Chow",
-      games: "7",
-      goals: "99",
-      assists: "10",
-      points: "100",
-      wins: "10",
-      loss: "0",
-      gaa: "2"
+  const team1 = []
+  const team2 = []
+  const team1Name = props.currentSeries.teams[0].name
+  const team2Name = props.currentSeries.teams[1].name
+  props.currentSeriesStats.forEach((player, i) => {
+    const playerStats = {
+      key: i,
+      id: player.id,
+      num: player.num,
+      player: player.name,
+      games: player.games,
+      goals: player.goals,
+      assists: player.assists,
+      points: player.goals + player.assists,
+      wins: player.wins,
+      loss: player.is_goalie - player.wins,
     }
-  ];
-  const team2 = [
-    {
-      key: "1",
-      id: "99",
-      player: "Eric Chow",
-      games: "7",
-      goals: "100",
-      assists: "10",
-      points: "1000",
-      wins: "10",
-      loss: "0",
-      gaa: "2"
-    },
-    {
-      key: "2",
-      id: "92",
-      player: "arwef Chow",
-      games: "7",
-      goals: "100",
-      assists: "10",
-      points: "100",
-      wins: "10",
-      loss: "0",
-      gaa: "2"
-    },
-    {
-      key: "3",
-      id: "99",
-      player: "Ericewefwef Chow",
-      games: "7",
-      goals: "19",
-      assists: "10",
-      points: "100",
-      wins: "10",
-      loss: "0",
-      gaa: "2"
+    if (player.is_goalie > 0) {
+      playerStats.gaa = Math.round((player.ga / player.is_goalie + Number.EPSILON) * 100) / 100
+    } else {
+      playerStats.gaa = 0
     }
-  ];
+    if (player.current_team_id % 2) {
+      team1.push(playerStats)
+    } else {
+      team2.push(playerStats)
+    }
+  });
+
   return (
     <>
-        <CardTemplate header="Current Series Stats">
-          <Row gutter={24}>
-            <Col lg={12}>
-              <h2>Team Name 1</h2>
-              <StatsTable data={team1} handleClick={props.handleClick} />
-            </Col>
-            <Col lg={12}>
-              <h2>Team Name 2</h2>
-              <StatsTable data={team2} handleClick={props.handleClick} />
-            </Col>
-          </Row>
-        </CardTemplate>
+      <Row gutter={24}>
+        <Col lg={12}>
+          <h2>{team1Name}</h2>
+          <StatsTable data={team1} handleClick={props.handleClick} />
+        </Col>
+        <Col lg={12}>
+          <h2>{team2Name}</h2>
+          <StatsTable data={team2} handleClick={props.handleClick} />
+        </Col>
+      </Row>
     </>
   )
+
 }
