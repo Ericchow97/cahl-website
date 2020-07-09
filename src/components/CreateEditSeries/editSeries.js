@@ -1,9 +1,9 @@
 import { editSeriesFetch } from '../Admin/SeriesFetchFunctions'
 import { addNewPlayers } from '../Admin/CommonFunctions'
 import { editPlayerFetch } from '../Admin/PlayerFetchFunctions'
+import { fetchRequest } from '../Admin/CommonFunctions'
 
-export const editSeries = async (values, allPlayers, team1, team2, seriesId) => {
-  let fetchErr = false
+export const editSeries = async (values, allPlayers, team1, team2, seriesId, context) => {
 
   // updates team instances with new players
   const changeTeamName = async () => {
@@ -21,16 +21,11 @@ export const editSeries = async (values, allPlayers, team1, team2, seriesId) => 
         }
       ]
     }
-    try {
-      const res = await editSeriesFetch(newSeriesData, seriesId)
-      if (res.ok) {
-        console.log('Success', await res.json())
-      } else {
-        throw new Error()
-      }
-    } catch {
-      fetchErr = true
+    const ret = await fetchRequest(editSeriesFetch, context, 'update', { data: newSeriesData, id: seriesId })
+    if (!ret.success) {
+      return ret
     }
+    return { success: true }
   }
 
   // create/update each player in player list 
@@ -48,15 +43,9 @@ export const editSeries = async (values, allPlayers, team1, team2, seriesId) => 
           current_team: teamName,
           is_active: true
         }
-        try {
-          const res = await editPlayerFetch(data, playerInfo.id)
-          if (res.ok) {
-            console.log('Success', await res.json())
-          } else {
-            throw new Error()
-          }
-        } catch {
-          fetchErr = true
+        const ret = await fetchRequest(editPlayerFetch, context, 'update', { data: data, id: playerInfo.id })
+        if (!ret.success) {
+          return ret
         }
       }
     }
@@ -69,24 +58,31 @@ export const editSeries = async (values, allPlayers, team1, team2, seriesId) => 
           current_team: null,
           is_active: false
         }
-        try {
-          const res = await editPlayerFetch(data, playerInfo.id)
-          if (res.ok) {
-            console.log('Success', await res.json())
-          } else {
-            throw new Error()
-          }
-        } catch {
-          fetchErr = true
+        const ret = await fetchRequest(editPlayerFetch, context, 'update', { data: data, id: playerInfo.id })
+        if (!ret.success) {
+          return ret
         }
       }
     }
+    return { success: true }
   }
 
-  await addNewPlayers(allPlayers, values.Team1Players, values.Team2Players)
-  await changeTeamName()
-  await updatePlayerSet(values.Team1Players, values.Team2Players, team1.players, values.Team1Name)
-  await updatePlayerSet(values.Team2Players, values.Team1Players, team2.players, values.Team2Name)
+  const addNewPlayersRes = await addNewPlayers(allPlayers, values.Team1Players, values.Team2Players)
+  if (!addNewPlayersRes.success) {
+    return addNewPlayersRes
+  }
+  const changeTeamNameRes = await changeTeamName()
+  if (!changeTeamNameRes.success) {
+    return changeTeamNameRes
+  }
+  const updatePlayerSet1Res = await updatePlayerSet(values.Team1Players, values.Team2Players, team1.players, values.Team1Name)
+  if (!updatePlayerSet1Res.success) {
+    return updatePlayerSet1Res
+  }
+  const updatePlayerSet2Res = await updatePlayerSet(values.Team2Players, values.Team1Players, team2.players, values.Team2Name)
+  if (!updatePlayerSet2Res.success) {
+    return updatePlayerSet2Res
+  }
 
-  return !fetchErr
+  return { success: true }
 };

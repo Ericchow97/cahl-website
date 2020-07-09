@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { Descriptions, Row, Col } from 'antd'
 import { CardTemplate } from '../CardTemplate'
+import { IsAdmin } from '../../AdminContextProvider'
 
 export const SeriesView = (props) => {
-
   const [invalidSeries, setInvalidSeries] = useState(false)
 
   const [team1, setTeam1] = useState([])
@@ -17,6 +17,7 @@ export const SeriesView = (props) => {
         const captainIndex = seriesInfo.teams[team].players.findIndex(player => player.name === seriesInfo.teams[team].captain)
         seriesInfo.teams[team].players.splice(0, 0, seriesInfo.teams[team].players.splice(captainIndex, 1)[0])
       }
+      setInvalidSeries(false)
       setTeam1(seriesInfo.teams[0])
       setTeam2(seriesInfo.teams[1])
     } else {
@@ -55,7 +56,7 @@ export const SeriesView = (props) => {
       <CardTemplate
         loading={props.allSeriesLoading}
         header={`Series #${props.seriesId}`}
-        extra={props.isAdmin}
+        extra={IsAdmin()}
         buttonText='Edit Series'
         handleClick={props.handleClick}
         disabled={invalidSeries}
@@ -73,7 +74,7 @@ export const SeriesView = (props) => {
                 {createPlayerDescription(team2.players)}
               </Col>
             </Row>
-        )}
+          )}
       </CardTemplate>
     </>
   )

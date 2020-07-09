@@ -1,8 +1,9 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import { Redirect } from 'react-router';
 import { Helmet } from 'react-helmet'
-import { Form, Input, Button, Alert } from 'antd';
+import { Form, Input, Button, message } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons'
+import { AdminContext } from './AdminContextProvider'
 
 const layout = {
     labelCol: {
@@ -19,14 +20,13 @@ const tailLayout = {
     },
 };
 
-// TODO: change the fetch to ES7
-export const LoginPage = (props) => {
-    const [redirect, setRedirect] = useState(props.isAdmin)
-    const [unsuccessfulSubmission, setUnsuccessfulSubmission] = useState(false)
+export const LoginPage = () => {
+    const adminContext = useContext(AdminContext)
 
-    const handleFinish = async values => {
-        //TODO: Do not redirect if username and pass do not match
-        const response = await fetch(`http://127.0.0.1:8000/api/token/`, {
+    const [redirect, setRedirect] = useState(adminContext.isAdmin)
+
+    const handleFinish = values => {
+        fetch(`http://127.0.0.1:8000/api/token/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -34,10 +34,9 @@ export const LoginPage = (props) => {
             body: JSON.stringify(values)
         })
             .then(res => {
-                // TODO: add back when figuring out authentication
-                // if (!res.ok) {
-                //     throw new Error();
-                // }
+                if (!res.ok) {
+                    throw new Error();
+                }
                 return res.json()
             })
             .then(data => {
@@ -45,19 +44,13 @@ export const LoginPage = (props) => {
                 window.localStorage.setItem('admin', true)
                 window.localStorage.setItem('auth_token', jwt_token.access)
                 window.localStorage.setItem('refresh_token', jwt_token.refresh)
-                props.setAdmin(true)
+                adminContext.changeAdmin(true)
                 setRedirect(true)
             })
-            .catch(error => {
-                console.error(error)
-                setUnsuccessfulSubmission(true)
+            .catch(() => {
+                message.error("Username or Password does not exist")
             })
     };
-
-    //TODO: want to do something when user fails?
-    const handleFinishFail = errorInfo => {
-        console.log('Failed', errorInfo)
-    }
 
     return (
         <>
@@ -70,7 +63,6 @@ export const LoginPage = (props) => {
                 {...layout}
                 name='Login Form'
                 onFinish={handleFinish}
-                onFinishFailed={handleFinishFail}
             >
                 <Form.Item
                     label='Username'
@@ -98,14 +90,6 @@ export const LoginPage = (props) => {
                     </Button>
                 </Form.Item>
             </Form>
-            {unsuccessfulSubmission &&
-                <Alert
-                    message="Username or Password does not exist"
-                    type="error"
-                    closable
-                    showIcon
-                />
-            }
         </>
     )
 }

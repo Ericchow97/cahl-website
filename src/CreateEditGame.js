@@ -4,13 +4,14 @@ import { Helmet } from 'react-helmet'
 import { GameInstance } from './components/CreateNewEditGame/GameInstance'
 import { CardTemplate } from './components/CardTemplate'
 import { useParams } from 'react-router-dom'
+import { IsAdmin } from './AdminContextProvider'
 
 export const CreateEditGame = (props) => {
   const { gameId } = useParams()
 
-  if (!props.isAdmin) {
+  if (!IsAdmin()) {
     return (
-      <Redirect push to='/' />
+      <Redirect push to='/login' />
     )
   } else {
     return (
@@ -25,7 +26,6 @@ export const CreateEditGame = (props) => {
             allGames={props.allGames}
             gameId={gameId}
             setSuccessfulSubmission={props.setSuccessfulSubmission}
-            setGameSuccess={props.setGameSuccess}
           />
         </CardTemplate >
       </>

@@ -3,7 +3,7 @@ import InfiniteScroll from 'react-infinite-scroller';
 import { List, Spin } from 'antd';
 
 export const PrevSummary = (props) => {
-  const [gameIds, setGameIds] = useState([20, 40])
+  const [gameIds, setGameIds] = useState([props.allGames.length, Math.min(props.allGames.length + 20, props.allGames[0].id)])
   const [isLoading, setLoading] = useState(false)
   const [hasMore, setHasMore] = useState(true)
 
@@ -16,7 +16,7 @@ export const PrevSummary = (props) => {
 
   const loadMore = async () => {
     setLoading(true)
-    if (gameIds[0] > props.allGames[0].id) {
+    if (gameIds[0] + 1 > props.allGames[0].id) {
       setHasMore(false)
       setLoading(false)
       return

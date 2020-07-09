@@ -20,7 +20,6 @@ export const TeamView = (props) => {
       </Helmet>
       {adminRedirect && <Redirect push to={`/teams/${seriesId}/admin/editTeams`} />}
       <SeriesView
-        isAdmin={props.isAdmin}
         seriesId={seriesId}
         allSeries={props.allSeries}
         handleClick={handleClick}

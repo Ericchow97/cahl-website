@@ -4,13 +4,14 @@ import { Helmet } from 'react-helmet'
 import { SeriesInstance } from './components/CreateEditSeries/SeriesInstance'
 import { CardTemplate } from './components/CardTemplate'
 import { useParams } from 'react-router-dom'
+import { IsAdmin } from './AdminContextProvider'
 
 export const CreateEditSeries = (props) => {
   let { seriesId } = useParams()
 
-  if (!props.isAdmin) {
+  if (!IsAdmin()) {
     return (
-      <Redirect push to='/' />
+      <Redirect push to='/login' />
     )
   } else {
     return (
@@ -24,7 +25,6 @@ export const CreateEditSeries = (props) => {
             allSeries={props.allSeries}
             seriesId={seriesId}
             setSuccessfulSubmission={props.setSuccessfulSubmission}
-            setSeriesSuccess={props.setSeriesSuccess}
           />
         </CardTemplate >
       </>

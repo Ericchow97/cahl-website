@@ -1,9 +1,9 @@
 import { createNewGameFetch, createNewGameSummaryFetch } from '../Admin/GameFetchFunctions'
 import { editSeriesFetch } from '../Admin/SeriesFetchFunctions'
 import { addNewPlayers } from '../Admin/CommonFunctions'
+import { fetchRequest } from '../Admin/CommonFunctions'
 
-export const createNewGame = async (values, allPlayers, currentSeries, team1Score, team2Score) => {
-  let fetchErr = false
+export const createNewGame = async (values, allPlayers, currentSeries, team1Score, team2Score, context) => {
 
   const teamsInfo = [
     {
@@ -41,38 +41,26 @@ export const createNewGame = async (values, allPlayers, currentSeries, team1Scor
   const createGame = async () => {
     addPlayerStats('Team1Players', 0)
     addPlayerStats('Team2Players', 1)
-    try {
-      // game_id used for creating game summary
-      let game_id = await createNewGameFetch(newGameData)
-      if (game_id.ok) {
-        game_id = await game_id.json()
-        console.log('Success', game_id)
-      } else {
-        throw new Error()
-      }
-      if (!values.game_summary.hidden) {
-        const data = {
-          game: game_id.id,
-          title: values.game_summary.title,
-          summary: values.game_summary.summary,
-          first_star: values.game_summary.star[0].name,
-          second_star: values.game_summary.star[1].name,
-          third_star: values.game_summary.star[2].name
-        }
-        try {
-          const res = await createNewGameSummaryFetch(data)
-          if (res.ok) {
-            console.log('Success', await res.json())
-          } else {
-            throw new Error()
-          }
-        } catch {
-          fetchErr = true
-        }
-      }
-    } catch {
-      fetchErr = true
+    const gameRet = await fetchRequest(createNewGameFetch, context, 'create', { data: newGameData })
+    if (!gameRet.success) {
+      return gameRet
     }
+    // if game summary exists
+    if (!values.game_summary.hidden) {
+      const data = {
+        game: gameRet.data.id,
+        title: values.game_summary.title,
+        summary: values.game_summary.summary,
+        first_star: values.game_summary.star[0].name,
+        second_star: values.game_summary.star[1].name,
+        third_star: values.game_summary.star[2].name
+      }
+      const gameSummaryRet = await fetchRequest(createNewGameSummaryFetch, context, 'create', { data: data })
+      if (!gameSummaryRet.success) {
+        return gameSummaryRet
+      }
+    }
+    return { success: true }
   }
 
   // edit series instance to update series score
@@ -88,16 +76,11 @@ export const createNewGame = async (values, allPlayers, currentSeries, team1Scor
         }
       ]
     }
-    try {
-      const res = await editSeriesFetch(data, currentSeries.id)
-      if (res.ok) {
-        console.log('Success', await res.json())
-      } else {
-        throw new Error()
-      }
-    } catch (e) {
-      fetchErr = true
+    const ret = await fetchRequest(editSeriesFetch, context, 'update', { data: data, id: currentSeries.id })
+    if (!ret.success) {
+      return ret
     }
+    return { success: true }
   }
 
   // create a new game instance on the server
@@ -107,9 +90,17 @@ export const createNewGame = async (values, allPlayers, currentSeries, team1Scor
     game_result: []
   }
 
-  fetchErr = await addNewPlayers(allPlayers, values.Team1Players, values.Team2Players)
-  await createGame()
-  await updateSeriesScore()
-
-  return !fetchErr
+  const addNewPlayersRes = await addNewPlayers(allPlayers, values.Team1Players, values.Team2Players)
+  if (!addNewPlayersRes.success) {
+    return addNewPlayersRes
+  }
+  const createGameRes = await createGame()
+  if (!createGameRes.success) {
+    return createGameRes
+  }
+  const updateSeriesScoreRes = await updateSeriesScore()
+  if (!updateSeriesScoreRes.success) {
+    return updateSeriesScoreRes
+  }
+  return { success: true }
 };

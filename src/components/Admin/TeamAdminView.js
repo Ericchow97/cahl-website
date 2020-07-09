@@ -107,7 +107,7 @@ export const TeamAdminView = (props) => {
                         <Select
                           showSearch
                           onInputKeyDown={e => handleSelect(e)}
-                          onSelect={name => props.onSelect(name)}
+                          onSelect={(name) => props.onSelect(name, field.name)}
                           style={{ color: 'black', padding: '0' }}
                           placeholder="Player Name"
                           dropdownRender={menu => (
@@ -196,7 +196,7 @@ export const TeamAdminView = (props) => {
                       <MinusCircleOutlined
                         onClick={() => {
                           remove(field.name)
-                          props.removeExistingPlayer()
+                          props.removeExistingPlayer(field.name)
                         }}
                       />
                     </Col>

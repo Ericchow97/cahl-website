@@ -1,21 +1,23 @@
-import React, { useState, useEffect } from 'react'
-import { Form, Alert, Button } from 'antd';
+import React, { useState, useEffect, useContext } from 'react'
+import { Form, Alert, Button, message } from 'antd';
 import { SeriesAdminView } from '../Admin/SeriesAdminView'
 import { Redirect } from 'react-router';
 import { CardTemplate } from '../CardTemplate'
 import { SeriesCard } from '../SeriesCard'
 import { ShootoutForm } from './ShootoutForm'
 import { CreateGameSummary } from './CreateGameSummary'
+import { AdminContext } from '../../AdminContextProvider'
 
 //functions
 import { createNewGame } from './createNewGame'
 import { editGame } from './editGame'
 
 export const GameInstance = (props) => {
+  const adminContext = useContext(AdminContext)
+
   const [redirect, setRedirect] = useState(false)
   const [isLoading, setLoading] = useState(true)
 
-  const [serverErrorMessage, setServerErrorMessage] = useState(false)
   const [unsuccessfulSubmission, setUnsuccessfulSubmission] = useState(false)
 
   //CREATE variables
@@ -62,7 +64,6 @@ export const GameInstance = (props) => {
         if (editGameRes.ok) {
           currentGame = await editGameRes.json()
         } else {
-          console.log('ran')
           setInvalidGame(true)
           setLoading(false)
           return
@@ -83,30 +84,30 @@ export const GameInstance = (props) => {
     } else {
       setTeam1Players(props.currentSeries.teams[0].players)
       setTeam2Players(props.currentSeries.teams[1].players)
+      setStarsDropdownList([...props.currentSeries.teams[0].players.map(player => {return {player_name: player.name}}), ...props.currentSeries.teams[1].players.map(player => {return {player_name: player.name}})])
       setLoading(false)
     }
   }, [props.currentSeries, props.allGames, props.gameId])
 
   const onFinish = async values => {
-    let success = false
+    let ret = false
     if (props.gameId) {
-      success = await editGame(values, allPlayers, prevGameStats, team1Score, team2Score)
-      if (success) {
-        props.setGameSuccess('Successfully edited game')
+      ret = await editGame(values, allPlayers, prevGameStats, team1Score, team2Score, adminContext)
+      if (ret.success) {
+        message.success('Successfully edited game')
       }
     } else {
-      success = await createNewGame(values, allPlayers, props.currentSeries, team1Score, team2Score)
-      if (success) {
-        props.setGameSuccess('Successfully created game')
+      ret = await createNewGame(values, allPlayers, props.currentSeries, team1Score, team2Score, adminContext)
+      if (ret.success) {
+        message.success('Successfully created game')
       }
     }
 
-    if (success) {
+    if (ret.success) {
       setRedirect(true)
-      props.setSuccessfulSubmission(true)
+      props.setSuccessfulSubmission(count => count + 1)
     } else {
-      setServerErrorMessage(true)
-      return
+      message.error(ret.message)
     }
   };
 
@@ -275,14 +276,6 @@ export const GameInstance = (props) => {
               closable
               showIcon
               afterClose={() => handleClose('fail')}
-            />
-          }
-          {serverErrorMessage &&
-            <Alert
-              message="Server Error"
-              type="error"
-              closable
-              showIcon
             />
           }
         </>

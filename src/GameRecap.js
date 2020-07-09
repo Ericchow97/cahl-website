@@ -4,8 +4,9 @@ import { Helmet } from 'react-helmet'
 import { CardTemplate } from './components/CardTemplate'
 import { GameSummary } from './components/GameRecap/GameSummary'
 import { PrevSummary } from './components/GameRecap/PrevSummary'
-import { Row, Col, Alert, Button, Drawer } from 'antd';
+import { Button, Drawer } from 'antd';
 import { useParams } from 'react-router-dom'
+import { IsAdmin } from './AdminContextProvider'
 
 export const GameRecap = (props) => {
   let { gameId } = useParams()
@@ -61,10 +62,6 @@ export const GameRecap = (props) => {
     setAdminRedirect(true)
   }
 
-  const handleClose = () => {
-    props.setGameSuccess()
-  }
-
   //Mobile Drawer functions
   const showDrawer = () => {
     setVisible(true)
@@ -81,64 +78,49 @@ export const GameRecap = (props) => {
       </Helmet>
       {redirect && <Redirect push to={`/gameRecap/${currentGameId}`} />}
       {adminRedirect && <Redirect push to={`/gameRecap/${currentGameId}/admin/editGame`} />}
-      {props.gameSuccess &&
-        <Alert
-          message={props.gameSuccess}
-          type="success"
-          closable
-          showIcon
-          afterClose={handleClose}
-        />
-      }
-      <Row gutter={16}>
-        <Col>
-          <CardTemplate
-            loading={props.gamesLoading || (!gameInfo.game_result && !invalidGame)}
-            header="Game Recap"
-            extra={props.isAdmin}
-            buttonText='Edit Game'
-            handleClick={handleAdminClick}
-            disabled={invalidGame}
-          >
-            {invalidGame ? (
-              <h1>This game does not exist</h1>
-            ) : (
-                <GameSummary
-                  gameInfo={gameInfo}
-                />
-              )
-            }
-          </CardTemplate>
-        </Col>
-        <Col>
-          <Button
-            type="primary"
-            style={{ marginBottom: '24px' }}
-            block
-            onClick={showDrawer}
-          >
-            See Previous Recaps
-          </Button>
-          <Drawer
-            title="Previous Recaps"
-            placement="right"
-            headerStyle={{
-              backgroundImage: "linear-gradient(to right, rgb(30,30,30) , red)",
-              fontSize: "24px"
-            }}
-            bodyStyle={{ backgroundColor: "black", padding: '8px' }}
-            closable={false}
-            onClose={onClose}
-            visible={visible}
-          >
-            <PrevSummary
-              handleClick={handleClick}
-              allGames={props.allGames}
-              setAllGames={props.setAllGames}
+      <CardTemplate
+        loading={props.gamesLoading || (!gameInfo.game_result && !invalidGame)}
+        header="Game Recap"
+        extra={IsAdmin()}
+        buttonText='Edit Game'
+        handleClick={handleAdminClick}
+        disabled={invalidGame}
+      >
+        {invalidGame ? (
+          <h1>This game does not exist</h1>
+        ) : (
+            <GameSummary
+              gameInfo={gameInfo}
             />
-          </Drawer>
-        </Col>
-      </Row>
+          )
+        }
+        <Button
+          type="primary"
+          style={{ marginBottom: '24px' }}
+          block
+          onClick={showDrawer}
+        >
+          See Previous Recaps
+          </Button>
+        <Drawer
+          title="Previous Recaps"
+          placement="right"
+          headerStyle={{
+            backgroundImage: "linear-gradient(to right, rgb(30,30,30) , red)",
+            fontSize: "24px"
+          }}
+          bodyStyle={{ backgroundColor: "black", padding: '8px' }}
+          closable={false}
+          onClose={onClose}
+          visible={visible}
+        >
+          <PrevSummary
+            handleClick={handleClick}
+            allGames={props.allGames}
+            setAllGames={props.setAllGames}
+          />
+        </Drawer>
+      </CardTemplate>
     </>
   )
 }

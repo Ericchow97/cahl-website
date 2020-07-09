@@ -23,13 +23,8 @@ import { AdminPage } from './AdminPage'
 const App = () => {
   const { Header, Content } = Layout;
 
-  // variables of states to be passed to other components
-  const [isAdmin, setAdmin] = useState(window.localStorage.getItem('admin'))
-
   //Reload State: when admin submits and is successful, have a refresh of all data
-  const [successfulSubmission, setSuccessfulSubmission] = useState(false)
-  const [seriesSuccess, setSeriesSuccess] = useState()
-  const [gameSuccess, setGameSuccess] = useState()
+  const [successfulSubmission, setSuccessfulSubmission] = useState(1)
 
   // TODO: change fetch url when have server, and image urls
 
@@ -120,15 +115,12 @@ const App = () => {
       <Layout>
         <img src={HeaderLogo} alt="CAHL Header" width="100%" />
         <Header style={{ padding: "0" }}>
-          <NavigationBar
-            isAdmin={isAdmin}
-          />
+          <NavigationBar />
         </Header>
         <Content style={{ padding: MobileOrTablet() ? "0 20px" : "0 50px" }}>
           <Switch>
             <Route exact path="/" render={() =>
               <Home
-                isAdmin={isAdmin}
                 homeLoading={homeLoading}
                 currentSeries={currentSeries}
                 recentGame={recentGame}
@@ -146,7 +138,6 @@ const App = () => {
             />
             <Route exact path='/players/:playerId' render={() =>
               <PlayerInfo
-                isAdmin={isAdmin}
                 allPlayers={allPlayers}
                 playersLoading={playersLoading}
                 setSuccessfulSubmission={setSuccessfulSubmission}
@@ -154,44 +145,34 @@ const App = () => {
             />
             <Route exact path="/teams" render={() =>
               <Teams
-                isAdmin={isAdmin}
                 allSeriesLoading={allSeriesLoading}
                 allSeries={allSeries}
-                seriesSuccess={seriesSuccess}
-                setSeriesSuccess={setSeriesSuccess}
               />}
             />
             <Route exact path="/teams/:seriesId" render={() =>
               <TeamView
-                isAdmin={isAdmin}
                 allSeries={allSeries}
                 allSeriesLoading={allSeriesLoading}
               />}
             />
             <Route exact path={["/gameRecap", "/gameRecap/:gameId"]} render={() =>
               <GameRecap
-                isAdmin={isAdmin}
                 gamesLoading={gamesLoading}
                 allGames={allGames}
                 setAllGames={setAllGames}
-                gameSuccess={gameSuccess}
-                setGameSuccess={setGameSuccess}
               />}
             />
             <Route exact path={['/admin/createSeries', "/teams/:seriesId/admin/editTeams"]} render={() =>
               <CreateEditSeries
-                isAdmin={isAdmin}
                 playersLoading={playersLoading}
                 allPlayers={allPlayers}
                 allSeriesLoading={allSeriesLoading}
                 allSeries={allSeries}
                 setSuccessfulSubmission={setSuccessfulSubmission}
-                setSeriesSuccess={setSeriesSuccess}
               />}
             />
             <Route exact path={['/admin/newGame', '/gameRecap/:gameId/admin/editGame']} render={() =>
               <CreateEditGame
-                isAdmin={isAdmin}
                 currentSeries={currentSeries}
                 homeLoading={homeLoading}
                 playersLoading={playersLoading}
@@ -199,14 +180,10 @@ const App = () => {
                 gamesLoading={gamesLoading}
                 allGames={allGames}
                 setSuccessfulSubmission={setSuccessfulSubmission}
-                setGameSuccess={setGameSuccess}
               />}
             />
             <Route exact path='/login' render={() =>
-              <LoginPage
-                isAdmin={isAdmin}
-                setAdmin={setAdmin}
-              />}
+              <LoginPage/>}
             />
             <Route exact path="/admin" render={() =>
               <AdminPage
@@ -214,14 +191,11 @@ const App = () => {
                 allSeries={allSeries}
                 gamesLoading={gamesLoading}
                 allGames={allGames}
-                isAdmin={isAdmin}
-                edit={true}
+                setAllGames={setAllGames}
               />}
             />
             <Route exact path='/logout' render={() =>
-              <LogoutPage
-                setAdmin={setAdmin}
-              />}
+              <LogoutPage/>}
             />
             <Route component={NoMatch} />
           </Switch>

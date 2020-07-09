@@ -1,10 +1,10 @@
 import { createNewGameStatFetch, editPlayerStatsFetch, deletePlayerStatsFetch } from '../Admin/PlayerFetchFunctions'
-import { editGameFetch, createNewGameSummaryFetch, editGameSummaryFetch,  } from '../Admin/GameFetchFunctions'
+import { editGameFetch, createNewGameSummaryFetch, editGameSummaryFetch, } from '../Admin/GameFetchFunctions'
 import { editSeriesFetch } from '../Admin/SeriesFetchFunctions'
 import { addNewPlayers } from '../Admin/CommonFunctions'
+import { fetchRequest } from '../Admin/CommonFunctions'
 
-export const editGame = async (values, allPlayers, prevGameStats, team1Score, team2Score) => {
-  let fetchErr = false
+export const editGame = async (values, allPlayers, prevGameStats, team1Score, team2Score, context) => {
 
   const teamsInfo = [
     {
@@ -44,15 +44,9 @@ export const editGame = async (values, allPlayers, prevGameStats, team1Score, te
     const game_data = {
       game_result: [...teamsInfo]
     }
-    try {
-      const res = await editGameFetch(game_data, prevGameStats.id)
-      if (res.ok) {
-        console.log('Success', await res.json())
-      } else {
-        throw new Error()
-      }
-    } catch (e) {
-      fetchErr = true
+    const ret = await fetchRequest(editGameFetch, context, 'update', { data: game_data, id: prevGameStats.id })
+    if (!ret.success) {
+      return ret
     }
     // update all player stats and remove previous stats
     for (let i = 0; i < gameStatsData.game_result.length; i++) {
@@ -70,30 +64,18 @@ export const editGame = async (values, allPlayers, prevGameStats, team1Score, te
             team_name: prevGameStats.game_result[i].team_name,
             ...playerData
           }
-          try {
-            const res = await createNewGameStatFetch(newPlayerStatsData)
-            if (res.ok) {
-              console.log('Success', await res.json())
-            } else {
-              throw new Error()
-            }
-          } catch (e) {
-            fetchErr = true
+          const ret = await fetchRequest(createNewGameStatFetch, context, 'create', { data: newPlayerStatsData })
+          if (!ret.success) {
+            return ret
           }
         } else {
           const statsChange = (prevPlayerData.goals !== playerData.goals || prevPlayerData.assists !== playerData.assists ||
             prevPlayerData.is_goalie !== playerData.is_goalie || prevPlayerData.win !== playerData.win || prevPlayerData.ga !== playerData.ga)
           // if stats or goalie stats have changed make a patch request to the gamestat
           if (statsChange) {
-            try {
-              const res = await editPlayerStatsFetch(playerData, prevPlayerData.id)
-              if (res.ok) {
-                console.log('Success', await res.json())
-              } else {
-                throw new Error()
-              }
-            } catch (e) {
-              fetchErr = true
+            const ret = await fetchRequest(editPlayerStatsFetch, context, 'update', { data: playerData, id: prevPlayerData.id })
+            if (!ret.success) {
+              return ret
             }
           }
           // Remove player from prevGameStatsResults
@@ -103,15 +85,9 @@ export const editGame = async (values, allPlayers, prevGameStats, team1Score, te
       // remove all players stats who weren't included in the update
       for (let j = 0; j < prevPlayers.length; j++) {
         const oldPlayer = prevPlayers[j]
-        try {
-          const res = await deletePlayerStatsFetch(oldPlayer.id)
-          if (res.ok) {
-            console.log('Success', await res.json())
-          } else {
-            throw new Error()
-          }
-        } catch (e) {
-          fetchErr = true
+        const ret = await fetchRequest(deletePlayerStatsFetch, context, 'delete', { id: oldPlayer.id })
+        if (!ret.success) {
+          return ret
         }
       }
     }
@@ -127,31 +103,20 @@ export const editGame = async (values, allPlayers, prevGameStats, team1Score, te
       }
       //if there is an existing game summary, make a patch request
       if (prevGameStats.game_summary) {
-        try {
-          const res = await editGameSummaryFetch(data, prevGameStats.id)
-          if (res.ok) {
-            console.log('Success', await res.json())
-          } else {
-            throw new Error()
-          }
-        } catch (e) {
-          fetchErr = true
+        const ret = await fetchRequest(editGameSummaryFetch, context, 'update', { data: data, id: prevGameStats.id })
+        if (!ret.success) {
+          return ret
         }
       }
       // else make a post to game summary
       else {
-        try {
-          const res = await createNewGameSummaryFetch(data, prevGameStats.id)
-          if (res.ok) {
-            console.log('Success', await res.json())
-          } else {
-            throw new Error()
-          }
-        } catch (e) {
-          fetchErr = true
+        const ret = await fetchRequest(createNewGameSummaryFetch, context, 'create', { data: data })
+        if (!ret.success) {
+          return ret
         }
       }
     }
+    return { success: true }
   }
 
   // edit series instance to update series score
@@ -173,17 +138,12 @@ export const editGame = async (values, allPlayers, prevGameStats, team1Score, te
           }
         ]
       }
-      try {
-        const res = await editSeriesFetch(data, prevGameStats.series_id)
-        if (res.ok) {
-          console.log('Success', await res.json())
-        } else {
-          throw new Error()
-        }
-      } catch (e) {
-        fetchErr = true
+      const ret = await fetchRequest(editSeriesFetch, context, 'update', { data: data })
+      if (!ret.success) {
+        return ret
       }
     }
+    return { success: true }
   }
 
   // create a game instance
@@ -192,9 +152,18 @@ export const editGame = async (values, allPlayers, prevGameStats, team1Score, te
   }
   // create copy of prevGameStats to bulk remove players after
   const prevGameStatsResults = [...prevGameStats.game_result]
-  fetchErr = await addNewPlayers(allPlayers, values.Team1Players, values.Team2Players)
-  await editGameStats()
-  await updateSeriesScore()
+  const addNewPlayersRes = await addNewPlayers(allPlayers, values.Team1Players, values.Team2Players)
+  if (!addNewPlayersRes.success) {
+    return addNewPlayersRes
+  }
+  const editGameStatsRes = await editGameStats()
+  if (!editGameStatsRes.success) {
+    return editGameStatsRes
+  }
+  const updateSeriesScoreRes = await updateSeriesScore()
+  if (!updateSeriesScoreRes.success) {
+    return updateSeriesScoreRes
+  }
 
-  return !fetchErr
+  return { success: true }
 };

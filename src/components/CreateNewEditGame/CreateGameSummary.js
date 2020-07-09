@@ -1,8 +1,8 @@
 import React from 'react'
 import { Form, Checkbox, Input, Select } from 'antd';
 
-const { Option } = Select
 const { TextArea } = Input
+
 export const CreateGameSummary = (props) => {
 
   const formItemLayout = {
@@ -30,6 +30,8 @@ export const CreateGameSummary = (props) => {
       }
     }
   }
+
+  const options = props.starsDropdownList.map(player => ({ value: player.player_name }))
 
   const starList = ['First Star', 'Second Star', 'Third Star']
   return (
@@ -106,10 +108,8 @@ export const CreateGameSummary = (props) => {
                       onInputKeyDown={e => handleSelect(e)}
                       style={{ color: 'black', padding: '0' }}
                       placeholder="Player Name"
+                      options={options}
                     >
-                      {props.starsDropdownList.map((player, i) => (
-                        <Option key={i} style={{ color: 'black' }} value={player.player_name}>{player.player_name}</Option>
-                      ))}
                     </Select>
                   </Form.Item>
                 ))}

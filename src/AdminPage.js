@@ -3,10 +3,10 @@ import { Redirect } from 'react-router'
 import { Helmet } from 'react-helmet'
 import { AdminPageInstance } from './components/AdminPage/AdminPageInstance'
 import { CardTemplate } from './components/CardTemplate'
+import { IsAdmin } from './AdminContextProvider'
 
 export const AdminPage = (props) => {
-  //TODO: Set up fetch for more games
-  if (!props.isAdmin) {
+  if (!IsAdmin()) {
     return (
       <Redirect push to='/login' />
     )
@@ -21,7 +21,7 @@ export const AdminPage = (props) => {
             allSeries={props.allSeries}
             allGames={props.allGames}
             setSuccessfulSubmission={props.setSuccessfulSubmission}
-            edit={props.edit}
+            setAllGames={props.setAllGames}
           />
         </CardTemplate >
       </>

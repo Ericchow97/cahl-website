@@ -3,6 +3,7 @@ export const createNewSeriesFetch = async (data) => {
     method: 'POST',
     mode: 'cors',
     headers: {
+      'Authorization': `Bearer ${window.localStorage.auth_token}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(data)
@@ -14,6 +15,7 @@ export const editSeriesFetch = async (data, id) => {
     method: 'PATCH',
     mode: 'cors',
     headers: {
+      'Authorization': `Bearer ${window.localStorage.auth_token}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(data)
