@@ -26,9 +26,9 @@ export const SeriesStats = (props) => {
       playerStats.gaa = 0
     }
     if (player.current_team_id % 2) {
-      team1.push(playerStats)
-    } else {
       team2.push(playerStats)
+    } else {
+      team1.push(playerStats)
     }
   });
 
