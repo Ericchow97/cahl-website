@@ -36,7 +36,7 @@ export const PlayerInfo = (props) => {
   useEffect(() => {
     // fetch to receive player data
     const fetchPlayerData = async (playerId) => {
-      const playerStatsDataRes = await (await fetch(`http://127.0.0.1:8000/playerstats/?player_id=${playerId}`)).json()
+      const playerStatsDataRes = await (await fetch(`https://6hbq50364a.execute-api.us-east-2.amazonaws.com/dev/playerstats/?player_id=${playerId}`)).json()
       if (playerStatsDataRes.length) {
         setPlayerStatsData(playerStatsDataRes)
         setPlayerStatsLoading(false)

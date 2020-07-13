@@ -36,7 +36,7 @@ export const SeriesView = (props) => {
         return (
           <Row gutter={[16, 16]} key={i}>
             <Col xs={10}>
-              <img src={`http://127.0.0.1:8000/media/${player.image}`} alt="player" style={{ width: "100%", height: "100%", minWidth: '60px' }} />
+              <img src={`https://6hbq50364a.execute-api.us-east-2.amazonaws.com/dev/media/${player.image}`} alt="player" style={{ width: "100%", height: "100%", minWidth: '60px' }} />
             </Col>
             <Col xs={14}>
               <Descriptions column={1}>

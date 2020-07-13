@@ -26,7 +26,7 @@ export const LoginPage = () => {
     const [redirect, setRedirect] = useState(adminContext.isAdmin)
 
     const handleFinish = values => {
-        fetch(`http://127.0.0.1:8000/api/token/`, {
+        fetch(`https://6hbq50364a.execute-api.us-east-2.amazonaws.com/dev/api/token/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
