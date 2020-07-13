@@ -21,7 +21,7 @@ export const PrevSummary = (props) => {
       setLoading(false)
       return
     }
-    const newGames = await (await (fetch(`http://127.0.0.1:8000/game/?game_ids=${gameIds[0]},${gameIds[1]}`))).json()
+    const newGames = await (await (fetch(`https://6hbq50364a.execute-api.us-east-2.amazonaws.com/dev/game/?game_ids=${gameIds[0]},${gameIds[1]}`))).json()
     props.setAllGames(allGames => [...allGames, ...newGames])
     setGameIds([gameIds[1], Math.min(gameIds[1] + (gameIds[1] - gameIds[0]), props.allGames[0].id)])
     setLoading(false)

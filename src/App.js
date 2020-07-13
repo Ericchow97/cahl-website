@@ -26,8 +26,6 @@ const App = () => {
   //Reload State: when admin submits and is successful, have a refresh of all data
   const [successfulSubmission, setSuccessfulSubmission] = useState(1)
 
-  // TODO: change fetch url when have server, and image urls
-
   // Home Page Variables
   const [currentSeries, setCurrentSeries] = useState([])
   const [recentGame, setRecentGame] = useState({})
@@ -51,10 +49,10 @@ const App = () => {
     // API request for Home page
     const fetchCurrentSeriesData = async () => {
       // get series information for home current series
-      const currentSeriesNumRes = fetch(`http://127.0.0.1:8000/series/?only_id=True`)
-      const currentSeriesFetch = fetch(`http://127.0.0.1:8000/series/?first=True`)
+      const currentSeriesNumRes = fetch(`https://6hbq50364a.execute-api.us-east-2.amazonaws.com/dev/series/?only_id=True`)
+      const currentSeriesFetch = fetch(`https://6hbq50364a.execute-api.us-east-2.amazonaws.com/dev/series/?first=True`)
       // get current series information for stat totals & scoring leaders
-      const currentSeriesStatsRes = (await (await fetch(`http://127.0.0.1:8000/players/?series_id=${(await (await currentSeriesNumRes).json()).id}`)).json())
+      const currentSeriesStatsRes = (await (await fetch(`https://6hbq50364a.execute-api.us-east-2.amazonaws.com/dev/players/?series_id=${(await (await currentSeriesNumRes).json()).id}`)).json())
       const currentSeriesRes = (await (await currentSeriesFetch).json())[0]
       setCurrentSeries(currentSeriesRes)
       const topScorers = currentSeriesStatsRes.sort((a, b) => {
@@ -75,7 +73,7 @@ const App = () => {
     }
     // API request for stats page
     const fetchStatsData = async () => {
-      const allPlayersRes = await (await fetch(`http://127.0.0.1:8000/players/`)).json()
+      const allPlayersRes = await (await fetch(`https://6hbq50364a.execute-api.us-east-2.amazonaws.com/dev/players/`)).json()
       // Add special player numbers
       for (let i = 0; i < allPlayersRes.length; i++) {
         if (allPlayersRes[i].name === 'Oscar Chow') {
@@ -90,13 +88,13 @@ const App = () => {
     // API request for Teams page
     const fetchAllSeriesData = async () => {
       // fetch all series
-      const allSeriesRes = await (await fetch(`http://127.0.0.1:8000/series/`)).json()
+      const allSeriesRes = await (await fetch(`https://6hbq50364a.execute-api.us-east-2.amazonaws.com/dev/series/`)).json()
       setAllSeries(allSeriesRes)
       setAllSeriesLoading(false)
     }
     //API request for Recap Page
     const fetchGameData = async () => {
-      const allGamesRes = await (await fetch(`http://127.0.0.1:8000/game/?game_ids=0,20`)).json()
+      const allGamesRes = await (await fetch(`https://6hbq50364a.execute-api.us-east-2.amazonaws.com/dev/game/?game_ids=0,20`)).json()
       setAllGames(allGamesRes)
       setGamesLoading(false)
     }
@@ -107,7 +105,6 @@ const App = () => {
 
   }, [successfulSubmission])
 
-  //General TODO: update alt for img tags
   return (
     <>
       <Helmet titleTemplate='%s | CAHL'>
