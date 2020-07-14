@@ -121,7 +121,7 @@ export const editGame = async (values, allPlayers, prevGameStats, team1Score, te
 
   // edit series instance to update series score
   const updateSeriesScore = async () => {
-    const series_info = await (await fetch(`https://6hbq50364a.execute-api.us-east-2.amazonaws.com/dev/series/${prevGameStats.series_id}/?only_series_score=true`)).json()
+    const series_info = await (await fetch(`https://y2egtnwief.execute-api.us-east-2.amazonaws.com/production/series/${prevGameStats.series_id}/?only_series_score=true`)).json()
     const prevTeamWin = (prevGameStats.game_result[0].team_score > prevGameStats.game_result[1].team_score ||
       prevGameStats.game_result[0].shootout_win) ? 0 : 1
     const teamWin = (team1Score > team2Score || values.ShootoutWinner === prevGameStats.game_result[0].team_name) ? 0 : 1

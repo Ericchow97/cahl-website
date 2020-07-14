@@ -62,7 +62,7 @@ export const fetchRequest = async (callback, context, type, obj) => {
 }
 
 export const refreshToken = async () => {
-  return await fetch(`https://6hbq50364a.execute-api.us-east-2.amazonaws.com/dev/api/token/refresh/`, {
+  return await fetch(`https://y2egtnwief.execute-api.us-east-2.amazonaws.com/production/api/token/refresh/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'

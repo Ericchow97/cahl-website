@@ -1,5 +1,5 @@
 export const createNewPlayerFetch = async (data) => {
-  return await fetch(`https://6hbq50364a.execute-api.us-east-2.amazonaws.com/dev/players/`, {
+  return await fetch(`https://y2egtnwief.execute-api.us-east-2.amazonaws.com/production/players/`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${window.localStorage.auth_token}`,
@@ -10,7 +10,7 @@ export const createNewPlayerFetch = async (data) => {
 }
 
 export const editPlayerFetch = async (data, id) => {
-  return await fetch(`https://6hbq50364a.execute-api.us-east-2.amazonaws.com/dev/players/${id}/`, {
+  return await fetch(`https://y2egtnwief.execute-api.us-east-2.amazonaws.com/production/players/${id}/`, {
     method: 'PATCH',
     headers: {
       'Authorization': `Bearer ${window.localStorage.auth_token}`,
@@ -21,7 +21,7 @@ export const editPlayerFetch = async (data, id) => {
 }
 
 export const editPlayerImageFetch = async (data, id) => {
-  return await fetch(`https://6hbq50364a.execute-api.us-east-2.amazonaws.com/dev/players/${id}/`, {
+  return await fetch(`https://y2egtnwief.execute-api.us-east-2.amazonaws.com/production/players/${id}/`, {
     headers: {
       'Authorization': `Bearer ${window.localStorage.auth_token}`
     },
@@ -31,14 +31,14 @@ export const editPlayerImageFetch = async (data, id) => {
 }
 
 export const editPlayerImageFetchPublic = async (data, id) => {
-  return await fetch(`https://6hbq50364a.execute-api.us-east-2.amazonaws.com/dev/players/${id}/`, {
+  return await fetch(`https://y2egtnwief.execute-api.us-east-2.amazonaws.com/production/players/${id}/`, {
     method: 'PATCH',
     body: data
   })
 }
 
 export const deletePlayerFetch = async (id) => {
-  return await fetch(`https://6hbq50364a.execute-api.us-east-2.amazonaws.com/dev/players/${id}/`, {
+  return await fetch(`https://y2egtnwief.execute-api.us-east-2.amazonaws.com/production/players/${id}/`, {
     headers: {
       'Authorization': `Bearer ${window.localStorage.auth_token}`
     },
@@ -47,7 +47,7 @@ export const deletePlayerFetch = async (id) => {
 }
 
 export const createNewGameStatFetch = async (data) => {
-  return await fetch(`https://6hbq50364a.execute-api.us-east-2.amazonaws.com/dev/playerstats/`, {
+  return await fetch(`https://y2egtnwief.execute-api.us-east-2.amazonaws.com/production/playerstats/`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${window.localStorage.auth_token}`,
@@ -58,7 +58,7 @@ export const createNewGameStatFetch = async (data) => {
 }
 
 export const editPlayerStatsFetch = async (data, id) => {
-  return await fetch(`https://6hbq50364a.execute-api.us-east-2.amazonaws.com/dev/playerstats/${id}/`, {
+  return await fetch(`https://y2egtnwief.execute-api.us-east-2.amazonaws.com/production/playerstats/${id}/`, {
     method: 'PATCH',
     headers: {
       'Authorization': `Bearer ${window.localStorage.auth_token}`,
@@ -69,7 +69,7 @@ export const editPlayerStatsFetch = async (data, id) => {
 }
 
 export const deletePlayerStatsFetch = async (id) => {
-  return await fetch(`https://6hbq50364a.execute-api.us-east-2.amazonaws.com/dev/playerstats/${id}/`, {
+  return await fetch(`https://y2egtnwief.execute-api.us-east-2.amazonaws.com/production/playerstats/${id}/`, {
     headers: {
       'Authorization': `Bearer ${window.localStorage.auth_token}`,
     },
