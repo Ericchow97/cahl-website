@@ -49,10 +49,10 @@ const App = () => {
     // API request for Home page
     const fetchCurrentSeriesData = async () => {
       // get series information for home current series
-      const currentSeriesNumRes = fetch(`https://6hbq50364a.execute-api.us-east-2.amazonaws.com/dev/series/?only_id=True`)
-      const currentSeriesFetch = fetch(`https://6hbq50364a.execute-api.us-east-2.amazonaws.com/dev/series/?first=True`)
+      const currentSeriesNumRes = fetch(`https://y2egtnwief.execute-api.us-east-2.amazonaws.com/production/series/?only_id=True`)
+      const currentSeriesFetch = fetch(`https://y2egtnwief.execute-api.us-east-2.amazonaws.com/production/series/?first=True`)
       // get current series information for stat totals & scoring leaders
-      const currentSeriesStatsRes = (await (await fetch(`https://6hbq50364a.execute-api.us-east-2.amazonaws.com/dev/players/?series_id=${(await (await currentSeriesNumRes).json()).id}`)).json())
+      const currentSeriesStatsRes = (await (await fetch(`https://y2egtnwief.execute-api.us-east-2.amazonaws.com/production/players/?series_id=${(await (await currentSeriesNumRes).json()).id}`)).json())
       const currentSeriesRes = (await (await currentSeriesFetch).json())[0]
       setCurrentSeries(currentSeriesRes)
       const topScorers = currentSeriesStatsRes.sort((a, b) => {
@@ -73,7 +73,7 @@ const App = () => {
     }
     // API request for stats page
     const fetchStatsData = async () => {
-      const allPlayersRes = await (await fetch(`https://6hbq50364a.execute-api.us-east-2.amazonaws.com/dev/players/`)).json()
+      const allPlayersRes = await (await fetch(`https://y2egtnwief.execute-api.us-east-2.amazonaws.com/production/players/`)).json()
       // Add special player numbers
       for (let i = 0; i < allPlayersRes.length; i++) {
         if (allPlayersRes[i].name === 'Oscar Chow') {
@@ -88,13 +88,13 @@ const App = () => {
     // API request for Teams page
     const fetchAllSeriesData = async () => {
       // fetch all series
-      const allSeriesRes = await (await fetch(`https://6hbq50364a.execute-api.us-east-2.amazonaws.com/dev/series/`)).json()
+      const allSeriesRes = await (await fetch(`https://y2egtnwief.execute-api.us-east-2.amazonaws.com/production/series/`)).json()
       setAllSeries(allSeriesRes)
       setAllSeriesLoading(false)
     }
     //API request for Recap Page
     const fetchGameData = async () => {
-      const allGamesRes = await (await fetch(`https://6hbq50364a.execute-api.us-east-2.amazonaws.com/dev/game/?game_ids=0,20`)).json()
+      const allGamesRes = await (await fetch(`https://y2egtnwief.execute-api.us-east-2.amazonaws.com/production/game/?game_ids=0,20`)).json()
       setAllGames(allGamesRes)
       setGamesLoading(false)
     }

@@ -60,7 +60,7 @@ export const GameInstance = (props) => {
       let currentGame = props.allGames[props.allGames[0].id - props.gameId]
       if (currentGame) {
       } else {
-        const editGameRes = await fetch(`https://6hbq50364a.execute-api.us-east-2.amazonaws.com/dev/game/${props.gameId}/`)
+        const editGameRes = await fetch(`https://y2egtnwief.execute-api.us-east-2.amazonaws.com/production/game/${props.gameId}/`)
         if (editGameRes.ok) {
           currentGame = await editGameRes.json()
         } else {

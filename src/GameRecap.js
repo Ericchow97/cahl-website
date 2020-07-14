@@ -24,7 +24,7 @@ export const GameRecap = (props) => {
   useEffect(() => {
     const fetchGame = async () => {
       try {
-        const gameRes = await fetch(`https://6hbq50364a.execute-api.us-east-2.amazonaws.com/dev/game/${currentGameId}/`)
+        const gameRes = await fetch(`https://y2egtnwief.execute-api.us-east-2.amazonaws.com/production/game/${currentGameId}/`)
         if (gameRes.ok) {
           setGameInfo(await (gameRes).json())
           setInvalidGame(false)

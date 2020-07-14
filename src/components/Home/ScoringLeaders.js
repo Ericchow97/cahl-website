@@ -5,7 +5,7 @@ import { Mobile } from '../../ResponsiveContextProvider'
 const { Column } = Table;
 
 export const ScoringLeaders = (props) => {
-    const [playerImage, setImage] = useState(`https://6hbq50364a.execute-api.us-east-2.amazonaws.com/dev/media/${props.topScorers[0].image}`)
+    const [playerImage, setImage] = useState(`https://zappa-uy1que6tl.s3.us-east-2.amazonaws.com/media/${props.topScorers[0].image}`)
 
     const data = props.topScorers.map((player, i) => {
         return {
@@ -21,7 +21,7 @@ export const ScoringLeaders = (props) => {
     })
 
     const handleMouseOver = (record) => {
-        setImage(`https://6hbq50364a.execute-api.us-east-2.amazonaws.com/dev/media/${record.image}`)
+        setImage(`https://zappa-uy1que6tl.s3.us-east-2.amazonaws.com/media/${record.image}`)
     }
 
     return (

@@ -1,5 +1,5 @@
 export const createNewSeriesFetch = async (data) => {
-  return await fetch(`https://6hbq50364a.execute-api.us-east-2.amazonaws.com/dev/series/`, {
+  return await fetch(`https://y2egtnwief.execute-api.us-east-2.amazonaws.com/production/series/`, {
     method: 'POST',
     mode: 'cors',
     headers: {
@@ -11,7 +11,7 @@ export const createNewSeriesFetch = async (data) => {
 }
 
 export const editSeriesFetch = async (data, id) => {
-  return await fetch(`https://6hbq50364a.execute-api.us-east-2.amazonaws.com/dev/series/${id}/`, {
+  return await fetch(`https://y2egtnwief.execute-api.us-east-2.amazonaws.com/production/series/${id}/`, {
     method: 'PATCH',
     mode: 'cors',
     headers: {
