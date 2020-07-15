@@ -18,7 +18,11 @@ export const PictureUpload = (props) => {
     if (!isAcceptableType) {
       message.error("You can only upload JPG/PNG/TIFF/GIF files!");
     }
-    return isAcceptableType;
+    const validFileSize = file.size < 5000000
+    if (!validFileSize) {
+      message.error("File size is too large!");
+    }
+    return isAcceptableType && validFileSize;
   }
 
   const handleChange = info => {
@@ -54,7 +58,7 @@ export const PictureUpload = (props) => {
         </p>
         <p className="ant-upload-text" style={{ color: 'black' }}>Click or drag file to this area to upload</p>
         <p className="ant-upload-hint" style={{ color: 'black' }}>
-          Please upload a single .jpg, .png, .tif, or .gif file (Max: 2.5mb)
+          Please upload a single .jpg, .png, .tif, or .gif file (Max: 5MB)
         </p>
       </Dragger>
     </>
