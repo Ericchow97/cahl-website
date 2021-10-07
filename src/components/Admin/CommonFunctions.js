@@ -25,6 +25,11 @@ export const fetchRequest = async (callback, context, type, obj) => {
         throw new Error('invalid type')
     }
     if (res.ok) {
+      if (res.status === 204) {
+        return {
+          success: true,
+        }
+      }
       const data = await res.json()
       console.log('Success', data)
       return {
@@ -53,7 +58,8 @@ export const fetchRequest = async (callback, context, type, obj) => {
         }
       }
     }
-  } catch {
+  } catch (err) {
+    console.log(err)
     return {
       success: false,
       message: 'Server Error. Please refresh and try again'

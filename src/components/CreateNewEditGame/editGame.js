@@ -79,8 +79,8 @@ export const editGame = async (values, allPlayers, prevGameStats, team1Score, te
             }
           }
           // Remove player from prevGameStatsResults
-          prevPlayers.splice(playerIndex, 1)
         }
+        prevPlayers.splice(playerIndex, 1)
       }
       // remove all players stats who weren't included in the update
       for (let j = 0; j < prevPlayers.length; j++) {
@@ -138,7 +138,7 @@ export const editGame = async (values, allPlayers, prevGameStats, team1Score, te
           }
         ]
       }
-      const ret = await fetchRequest(editSeriesFetch, context, 'update', { data: data })
+      const ret = await fetchRequest(editSeriesFetch, context, 'update', { data: data, id: prevGameStats.series_id })
       if (!ret.success) {
         return ret
       }
