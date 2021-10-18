@@ -112,3 +112,15 @@ export const addNewPlayers = async (allPlayers, team1Players, team2Players, cont
   }
 }
 
+export const createWalkOn = async (data) => {
+  console.log(JSON.stringify(data))
+  return await fetch(`https://y2egtnwief.execute-api.us-east-2.amazonaws.com/production/attendance/`, {
+    method: 'POST',
+    mode: 'cors',
+    headers: {
+      'Authorization': `Bearer ${window.localStorage.auth_token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data)
+  })
+}

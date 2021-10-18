@@ -3,7 +3,7 @@ import './App.css';
 import HeaderLogo from './assets/charity-hockey-banner.jpg'
 import { Switch, Route } from "react-router-dom";
 import { Helmet } from 'react-helmet'
-import { Layout } from 'antd';
+import { Layout, Alert } from 'antd';
 import { MobileOrTablet } from './ResponsiveContextProvider'
 import { Home } from './Home';
 import { PlayersStats } from './PlayersStats';
@@ -44,6 +44,15 @@ const App = () => {
   // Game page variables
   const [allGames, setAllGames] = useState([])
   const [gamesLoading, setGamesLoading] = useState(true)
+
+  // Walk On Banner Variables
+  const [walkOns, setWalkOns] = useState({})
+  const [gameDate, setGameDate] = useState()
+  const [visible, setVisible] = useState(false);
+
+  const handleClose = () => {
+    setVisible(false);
+  };
 
   useEffect(() => {
     // API request for Home page
@@ -98,11 +107,30 @@ const App = () => {
       setAllGames(allGamesRes)
       setGamesLoading(false)
     }
+
+    //API request for Walk-ons
+    const fetchWalkOns = async () => {
+      const [walkOns] = await (await fetch(`https://y2egtnwief.execute-api.us-east-2.amazonaws.com/production/attendance/`)).json()
+      console.log(walkOns)
+      setWalkOns({
+        players: walkOns.players,
+        goalies: walkOns.goalies,
+      })
+      const walkOnsDate = new Date(walkOns.date)
+      const currDate = new Date(new Date().setHours(21))
+      const prevSat = new Date(currDate.setDate(currDate.getDate() - (currDate.getDay() + 1)))
+      const nextSat = new Date(currDate.setDate(currDate.getDate() + 7))
+      setGameDate(nextSat)
+      if (walkOns.players + walkOns.goalies > 0 && walkOnsDate > prevSat && walkOnsDate < nextSat) {
+        setVisible(true)
+      }
+    }
+
     fetchCurrentSeriesData()
     fetchAllSeriesData()
     fetchStatsData()
     fetchGameData()
-
+    fetchWalkOns()
   }, [successfulSubmission])
 
   return (
@@ -110,6 +138,14 @@ const App = () => {
       <Helmet titleTemplate='%s | CAHL'>
       </Helmet>
       <Layout>
+        {visible && <Alert
+          message={`Walk-On Openings ${gameDate.toDateString()}`}
+          description={`Players: ${walkOns.players} \nPlease email Ken Chow for availabilities`}
+          type="info"
+          showIcon
+          closable
+          afterClose={handleClose}
+        />}
         <img src={HeaderLogo} alt="CAHL Header" width="100%" />
         <Header style={{ padding: "0" }}>
           <NavigationBar />
@@ -180,7 +216,7 @@ const App = () => {
               />}
             />
             <Route exact path='/login' render={() =>
-              <LoginPage/>}
+              <LoginPage />}
             />
             <Route exact path="/admin" render={() =>
               <AdminPage
@@ -192,7 +228,7 @@ const App = () => {
               />}
             />
             <Route exact path='/logout' render={() =>
-              <LogoutPage/>}
+              <LogoutPage />}
             />
             <Route component={NoMatch} />
           </Switch>

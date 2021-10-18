@@ -33,6 +33,7 @@ module.exports = override(
       "@tabs-hover-color": "#fff",
       "@tabs-highlight-color": "#fff",
       "@table-body-sort-bg": "none",
+      "@alert-text-color": "#000",
     }
   })
 );

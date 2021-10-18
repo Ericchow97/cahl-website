@@ -173,3 +173,7 @@ pre {
 .ant-select-item-option-content {
   color: black;
 }
+
+.ant-alert-description {
+  white-space: pre-wrap;
+}

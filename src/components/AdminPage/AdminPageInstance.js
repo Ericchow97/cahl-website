@@ -1,11 +1,17 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import { Redirect } from 'react-router';
-import { Button, Row, Col, Select, Spin } from 'antd';
+import { Button, Row, Col, Select, Spin, InputNumber, message } from 'antd';
+import { fetchRequest, createWalkOn } from '../Admin/CommonFunctions'
+import { AdminContext } from '../../AdminContextProvider'
+
 
 export const AdminPageInstance = (props) => {
   const [redirectTo, setRedirectTo] = useState()
   const [gameInstance, setGameInstance] = useState()
   const [seriesInstance, setSeriesInstance] = useState()
+  const [players, setPlayers] = useState(0)
+  const [goalies, setGoalies] = useState(0)
+  const adminContext = useContext(AdminContext)
 
   const [gameIds, setGameIds] = useState([props.allGames.length, Math.min(props.allGames.length + 20, props.allGames[0].id)])
   const [isLoading, setLoading] = useState(false)
@@ -13,6 +19,22 @@ export const AdminPageInstance = (props) => {
 
   const handleClick = (e) => {
     setRedirectTo(e.target.innerText)
+  }
+
+  const handleSubmit = async () => {
+    const data = {
+      id: 1,
+      date: new Date().toISOString(),
+      players: players,
+      goalies: goalies
+    }
+    const ret = await fetchRequest(createWalkOn, adminContext, 'create', { data: data })
+    console.log(ret)
+    if (!ret.success) {
+      return ret
+    }
+    message.success('Successfully updated')
+    return { success: true }
   }
 
   const handleOptionSelect = (type, id) => {
@@ -125,6 +147,22 @@ export const AdminPageInstance = (props) => {
         </Col>
         <Col xs={6} style={{ textAlign: 'right' }}>
           <Button type="primary" onClick={handleClick}>Edit Series</Button>
+        </Col>
+      </Row>
+      <Row gutter={[0, 16]}>
+        <Col xs={6}>
+          <h3>Walk-ons</h3>
+        </Col>
+        <Col xs={6}>
+          <p>Players</p>
+          <InputNumber onChange={e => setPlayers(e)} />
+        </Col>
+        <Col xs={6}>
+          <p>Goalies</p>
+          <InputNumber onChange={e => setGoalies(e)} />
+        </Col>
+        <Col xs={6} style={{ textAlign: 'right' }}>
+          <Button type="primary" onClick={handleSubmit}>Submit</Button>
         </Col>
       </Row>
       <Row gutter={[0, 16]}>
