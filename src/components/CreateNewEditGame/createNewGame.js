@@ -2,6 +2,7 @@ import { createNewGameFetch, createNewGameSummaryFetch } from '../Admin/GameFetc
 import { editSeriesFetch } from '../Admin/SeriesFetchFunctions'
 import { addNewPlayers } from '../Admin/CommonFunctions'
 import { fetchRequest } from '../Admin/CommonFunctions'
+import { editPlayerFetch } from '../Admin/PlayerFetchFunctions'
 
 export const createNewGame = async (values, allPlayers, currentSeries, team1Score, team2Score, context) => {
 
@@ -90,6 +91,24 @@ export const createNewGame = async (values, allPlayers, currentSeries, team1Scor
     game_result: []
   }
 
+  const updatePlayerSet = async (teamPlayers, teamName) => {
+    // sort through all the players from each team
+    for (let i = 0; i < teamPlayers.length; i++) {
+      const playerIndex = allPlayers.findIndex(player => player.name === teamPlayers[i].name)
+      const playerInfo = allPlayers[playerIndex]
+      // update existing player
+      const data = {
+        current_team: teamName,
+        is_active: true,
+      }
+      const ret = await fetchRequest(editPlayerFetch, context, 'update', { data: data, id: playerInfo.id })
+      if (!ret.success) {
+        return ret
+      }
+    }
+    return { success: true }
+  }
+
   const addNewPlayersRes = await addNewPlayers(allPlayers, values.Team1Players, values.Team2Players)
   if (!addNewPlayersRes.success) {
     return addNewPlayersRes
@@ -102,5 +121,14 @@ export const createNewGame = async (values, allPlayers, currentSeries, team1Scor
   if (!updateSeriesScoreRes.success) {
     return updateSeriesScoreRes
   }
+  const updatePlayerSet1Res = await updatePlayerSet(values.Team1Players, values.Team1Name)
+  if (!updatePlayerSet1Res.success) {
+    return updatePlayerSet1Res
+  }
+  const updatePlayerSet2Res = await updatePlayerSet(values.Team2Players, values.Team2Name)
+  if (!updatePlayerSet2Res.success) {
+    return updatePlayerSet2Res
+  }
+
   return { success: true }
 };

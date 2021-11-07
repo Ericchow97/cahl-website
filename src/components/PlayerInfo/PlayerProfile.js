@@ -98,7 +98,7 @@ export const PlayerProfile = (props) => {
       <Helmet>
         <title>{`${props.playerData.name}`}</title>
       </Helmet>
-      <img src='https://nhl.bamcontent.com/images/arena/default/10.jpg' alt="background" width='100%' />
+      <img src='https://zappa-uy1que6tl.s3.us-east-2.amazonaws.com/static/admin/img/10.jpg' alt="background" width='100%' />
       <img src={`https://zappa-uy1que6tl.s3.us-east-2.amazonaws.com/media/${props.playerData.image}`} alt="player" className='circle-img' />
       <div className="player-info">
         {props.playerData.name}

@@ -42,7 +42,7 @@ export const SeriesCard = (props) => {
     
     let gameNumber = 0
     if (props.seriesGames && props.seriesGames.length) {
-       gameNumber = props.seriesGames.length + 1
+       gameNumber = props.seriesGames.length
     }
 
     return (
