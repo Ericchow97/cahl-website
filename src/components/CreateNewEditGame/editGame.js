@@ -5,7 +5,7 @@ import { addNewPlayers } from '../Admin/CommonFunctions'
 import { fetchRequest } from '../Admin/CommonFunctions'
 import { editPlayerFetch } from '../Admin/PlayerFetchFunctions'
 
-export const editGame = async (values, allPlayers, prevGameStats, team1Score, team2Score, context) => {
+export const editGame = async (values, allPlayers, prevGameStats, team1Score, team2Score, context, team1Name, team2Name) => {
 
   const teamsInfo = [
     {
@@ -152,6 +152,9 @@ export const editGame = async (values, allPlayers, prevGameStats, team1Score, te
     for (let i = 0; i < teamPlayers.length; i++) {
       const playerIndex = allPlayers.findIndex(player => player.name === teamPlayers[i].name)
       const playerInfo = allPlayers[playerIndex]
+      if (playerInfo.is_active) {
+        continue
+      }
       // update existing player
       const data = {
         current_team: teamName,
@@ -184,11 +187,11 @@ export const editGame = async (values, allPlayers, prevGameStats, team1Score, te
     return updateSeriesScoreRes
   }
 
-  const updatePlayerSet1Res = await updatePlayerSet(values.Team1Players, values.Team1Name)
+  const updatePlayerSet1Res = await updatePlayerSet(values.Team1Players, team1Name)
   if (!updatePlayerSet1Res.success) {
     return updatePlayerSet1Res
   }
-  const updatePlayerSet2Res = await updatePlayerSet(values.Team2Players, values.Team2Name)
+  const updatePlayerSet2Res = await updatePlayerSet(values.Team2Players, team2Name)
   if (!updatePlayerSet2Res.success) {
     return updatePlayerSet2Res
   }

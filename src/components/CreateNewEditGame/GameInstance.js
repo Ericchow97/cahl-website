@@ -92,12 +92,12 @@ export const GameInstance = (props) => {
   const onFinish = async values => {
     let ret = false
     if (props.gameId) {
-      ret = await editGame(values, allPlayers, prevGameStats, team1Score, team2Score, adminContext)
+      ret = await editGame(values, allPlayers, prevGameStats, team1Score, team2Score, adminContext, team1Name, team2Name)
       if (ret.success) {
         message.success('Successfully edited game')
       }
     } else {
-      ret = await createNewGame(values, allPlayers, props.currentSeries, team1Score, team2Score, adminContext)
+      ret = await createNewGame(values, allPlayers, props.currentSeries, team1Score, team2Score, adminContext, team1Name, team2Name)
       if (ret.success) {
         message.success('Successfully created game')
       }
