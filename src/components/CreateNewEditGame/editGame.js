@@ -152,7 +152,7 @@ export const editGame = async (values, allPlayers, prevGameStats, team1Score, te
     for (let i = 0; i < teamPlayers.length; i++) {
       const playerIndex = allPlayers.findIndex(player => player.name === teamPlayers[i].name)
       const playerInfo = allPlayers[playerIndex]
-      if (playerInfo.is_active) {
+      if (playerInfo.current_team && playerInfo.is_active) {
         continue
       }
       // update existing player
